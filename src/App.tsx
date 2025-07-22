@@ -1,13 +1,10 @@
-"use client"
-
 import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Package, QrCode, LogOut, Settings } from "lucide-react"
+import { Toaster } from 'react-hot-toast';
+
+import { Button, Badge, Avatar, AvatarFallback, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ShipmentsTab, ShipmentDetailTab, AuditLogsTab, UsersTab } from "@/app/components"
-import { Package, QrCode, FileText, Users, LogOut, Settings } from "lucide-react"
+import { ShipmentDetailTab, AuditLogsTab, UsersTab, ShipmentsTabUseGM65 } from "@/app/components"
 
 // Mock user data
 const mockUsers = {
@@ -28,9 +25,9 @@ const mockUsers = {
 }
 
 export default function Component() {
-  const [currentUser, setCurrentUser] = useState<"admin" | "user">("admin")
+  const [currentUser] = useState<"admin" | "user">("admin")
   const [activeTab, setActiveTab] = useState("shipments")
-  const [selectedShipment, setSelectedShipment] = useState<string | null>(null)
+  const [, setSelectedShipment] = useState<string | null>(null)
 
   const user = mockUsers[currentUser]
   const isAdmin = currentUser === "admin"
@@ -42,6 +39,7 @@ export default function Component() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster />
       {/* Header */}
       <header className="px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between mx-auto max-w-7xl">
@@ -56,25 +54,6 @@ export default function Component() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Role Switcher for Demo */}
-            <div className="items-center hidden p-1 space-x-2 bg-gray-100 rounded-lg sm:flex">
-              <Button
-                variant={currentUser === "admin" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setCurrentUser("admin")}
-                className="text-xs"
-              >
-                Admin View
-              </Button>
-              <Button
-                variant={currentUser === "user" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setCurrentUser("user")}
-                className="text-xs"
-              >
-                User View
-              </Button>
-            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -111,7 +90,7 @@ export default function Component() {
       {/* Main Content */}
       <main className="px-4 py-6 mx-auto max-w-7xl">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 gap-4 sm:grid-cols-4">
             <TabsTrigger value="shipments" className="flex items-center space-x-2">
               <Package className="w-4 h-4" />
               <span className="hidden sm:inline">Shipments</span>
@@ -120,7 +99,7 @@ export default function Component() {
               <QrCode className="w-4 h-4" />
               <span className="hidden sm:inline">Detail</span>
             </TabsTrigger>
-            <TabsTrigger value="audit-logs" className="flex items-center space-x-2">
+            {/* <TabsTrigger value="audit-logs" className="flex items-center space-x-2">
               <FileText className="w-4 h-4" />
               <span className="hidden sm:inline">Audit Logs</span>
             </TabsTrigger>
@@ -129,15 +108,15 @@ export default function Component() {
                 <Users className="w-4 h-4" />
                 <span className="hidden sm:inline">Users</span>
               </TabsTrigger>
-            )}
+            )} */}
           </TabsList>
 
           <TabsContent value="shipments" className="space-y-6">
-            <ShipmentsTab currentUser={currentUser} onShipmentSelect={handleShipmentSelect} />
+            <ShipmentsTabUseGM65 currentUser={currentUser} onShipmentSelect={handleShipmentSelect} />
           </TabsContent>
 
           <TabsContent value="shipment-detail" className="space-y-6">
-            <ShipmentDetailTab selectedShipment={selectedShipment} currentUser={currentUser} />
+            <ShipmentDetailTab />
           </TabsContent>
 
           <TabsContent value="audit-logs" className="space-y-6">

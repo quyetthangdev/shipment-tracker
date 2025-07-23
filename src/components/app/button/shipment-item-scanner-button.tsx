@@ -22,7 +22,6 @@ export default function ShipmentItemScannerButton() {
 
             if (event.key === 'Enter' || event.key === 'Tab') {
                 const code = scannerInputRef.current.trim();
-                console.log("Scanner input:", code);
                 if (code) {
                     const isShipment = /^SHIP-\d+$/.test(code);
                     const isShipmentItem = /^SHIP-\d+-ITEM-\d+$/.test(code);

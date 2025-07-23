@@ -3,8 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
@@ -14,150 +13,146 @@ import moment from "moment"
 // import { format } from "date-fns"
 
 // Mock audit log data
-const mockAuditLogs = {
-    admin: [
-        {
-            id: "log-1",
-            timestamp: "2024-01-16 11:45:12",
-            action: "QR Scanned",
-            details: "QR001234569 scanned for SH001",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-        {
-            id: "log-2",
-            timestamp: "2024-01-16 11:15:33",
-            action: "QR Scanned",
-            details: "QR001234567 scanned for SH001 (Duplicate)",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Duplicate",
-        },
-        {
-            id: "log-3",
-            timestamp: "2024-01-16 11:15:00",
-            action: "Shipment Created",
-            details: "Created shipment SH003 with 200 items",
-            user: "John Admin",
-            deviceId: "WEB-001",
-            shipmentId: "SH003",
-            status: "Success",
-        },
-        {
-            id: "log-4",
-            timestamp: "2024-01-15 10:32:22",
-            action: "QR Scanned",
-            details: "QR001234568 scanned for SH001",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-        {
-            id: "log-5",
-            timestamp: "2024-01-15 10:30:15",
-            action: "QR Scanned",
-            details: "QR001234567 scanned for SH001",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-        {
-            id: "log-6",
-            timestamp: "2024-01-15 09:30:00",
-            action: "Shipment Created",
-            details: "Created shipment SH001 with 150 items",
-            user: "John Admin",
-            deviceId: "WEB-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-        {
-            id: "log-7",
-            timestamp: "2024-01-15 09:00:00",
-            action: "User Login",
-            details: "User logged in successfully",
-            user: "John Admin",
-            deviceId: "WEB-001",
-            shipmentId: null,
-            status: "Success",
-        },
-    ],
-    user: [
-        {
-            id: "log-1",
-            timestamp: "2024-01-16 11:45:12",
-            action: "QR Scanned",
-            details: "QR001234569 scanned for SH001",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-        {
-            id: "log-2",
-            timestamp: "2024-01-16 11:15:33",
-            action: "QR Scanned",
-            details: "QR001234567 scanned for SH001 (Duplicate)",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Duplicate",
-        },
-        {
-            id: "log-4",
-            timestamp: "2024-01-15 10:32:22",
-            action: "QR Scanned",
-            details: "QR001234568 scanned for SH001",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-        {
-            id: "log-5",
-            timestamp: "2024-01-15 10:30:15",
-            action: "QR Scanned",
-            details: "QR001234567 scanned for SH001",
-            user: "Sarah User",
-            deviceId: "DEVICE-001",
-            shipmentId: "SH001",
-            status: "Success",
-        },
-    ],
-}
+// const mockAuditLogs = {
+//     admin: [
+//         {
+//             id: "log-1",
+//             timestamp: "2024-01-16 11:45:12",
+//             action: "QR Scanned",
+//             details: "QR001234569 scanned for SH001",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-2",
+//             timestamp: "2024-01-16 11:15:33",
+//             action: "QR Scanned",
+//             details: "QR001234567 scanned for SH001 (Duplicate)",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Duplicate",
+//         },
+//         {
+//             id: "log-3",
+//             timestamp: "2024-01-16 11:15:00",
+//             action: "Shipment Created",
+//             details: "Created shipment SH003 with 200 items",
+//             user: "John Admin",
+//             deviceId: "WEB-001",
+//             shipmentId: "SH003",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-4",
+//             timestamp: "2024-01-15 10:32:22",
+//             action: "QR Scanned",
+//             details: "QR001234568 scanned for SH001",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-5",
+//             timestamp: "2024-01-15 10:30:15",
+//             action: "QR Scanned",
+//             details: "QR001234567 scanned for SH001",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-6",
+//             timestamp: "2024-01-15 09:30:00",
+//             action: "Shipment Created",
+//             details: "Created shipment SH001 with 150 items",
+//             user: "John Admin",
+//             deviceId: "WEB-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-7",
+//             timestamp: "2024-01-15 09:00:00",
+//             action: "User Login",
+//             details: "User logged in successfully",
+//             user: "John Admin",
+//             deviceId: "WEB-001",
+//             shipmentId: null,
+//             status: "Success",
+//         },
+//     ],
+//     user: [
+//         {
+//             id: "log-1",
+//             timestamp: "2024-01-16 11:45:12",
+//             action: "QR Scanned",
+//             details: "QR001234569 scanned for SH001",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-2",
+//             timestamp: "2024-01-16 11:15:33",
+//             action: "QR Scanned",
+//             details: "QR001234567 scanned for SH001 (Duplicate)",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Duplicate",
+//         },
+//         {
+//             id: "log-4",
+//             timestamp: "2024-01-15 10:32:22",
+//             action: "QR Scanned",
+//             details: "QR001234568 scanned for SH001",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//         {
+//             id: "log-5",
+//             timestamp: "2024-01-15 10:30:15",
+//             action: "QR Scanned",
+//             details: "QR001234567 scanned for SH001",
+//             user: "Sarah User",
+//             deviceId: "DEVICE-001",
+//             shipmentId: "SH001",
+//             status: "Success",
+//         },
+//     ],
+// }
 
-interface AuditLogsTabProps {
-    currentUser: "admin" | "user"
-}
-
-export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
+export default function AuditLogsTab() {
     const [searchTerm, setSearchTerm] = useState("")
     const [actionFilter, setActionFilter] = useState("all")
     const [dateFrom, setDateFrom] = useState<Date>()
     const [dateTo, setDateTo] = useState<Date>()
 
-    const logs = mockAuditLogs[currentUser]
-    const isAdmin = currentUser === "admin"
+    // const logs = mockAuditLogs[currentUser]
+    // const isAdmin = currentUser === "admin"
 
     // Filter logs based on search and filters
-    const filteredLogs = logs.filter((log) => {
-        const matchesSearch =
-            log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.action.toLowerCase().includes(searchTerm.toLowerCase())
+    // const filteredLogs = logs.filter((log) => {
+    //     const matchesSearch =
+    //         log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //         log.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //         log.action.toLowerCase().includes(searchTerm.toLowerCase())
 
-        const matchesAction = actionFilter === "all" || log.action === actionFilter
+    //     const matchesAction = actionFilter === "all" || log.action === actionFilter
 
-        // Simple date filtering (in a real app, you'd parse the dates properly)
-        const matchesDate = true // Simplified for demo
+    //     // Simple date filtering (in a real app, you'd parse the dates properly)
+    //     const matchesDate = true // Simplified for demo
 
-        return matchesSearch && matchesAction && matchesDate
-    })
+    //     return matchesSearch && matchesAction && matchesDate
+    // })
 
     const handleExportCSV = () => {
         console.log("Exporting to CSV...")
@@ -169,49 +164,49 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
         // In a real app, this would generate and download a PDF file
     }
 
-    const getStatusBadge = (status: string) => {
-        switch (status) {
-            case "Success":
-                return <Badge className="bg-green-600">Success</Badge>
-            case "Duplicate":
-                return <Badge variant="destructive">Duplicate</Badge>
-            case "Error":
-                return <Badge variant="destructive">Error</Badge>
-            default:
-                return <Badge variant="secondary">{status}</Badge>
-        }
-    }
+    // const getStatusBadge = (status: string) => {
+    //     switch (status) {
+    //         case "Success":
+    //             return <Badge className="bg-green-600">Success</Badge>
+    //         case "Duplicate":
+    //             return <Badge variant="destructive">Duplicate</Badge>
+    //         case "Error":
+    //             return <Badge variant="destructive">Error</Badge>
+    //         default:
+    //             return <Badge variant="secondary">{status}</Badge>
+    //     }
+    // }
 
-    const getActionIcon = (action: string) => {
-        switch (action) {
-            case "QR Scanned":
-                return "📱"
-            case "Shipment Created":
-                return "📦"
-            case "User Login":
-                return "🔐"
-            default:
-                return "📝"
-        }
-    }
+    // const getActionIcon = (action: string) => {
+    //     switch (action) {
+    //         case "QR Scanned":
+    //             return "📱"
+    //         case "Shipment Created":
+    //             return "📦"
+    //         case "User Login":
+    //             return "🔐"
+    //         default:
+    //             return "📝"
+    //     }
+    // }
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Audit Logs</h2>
                     <p className="text-gray-600">
-                        {isAdmin ? "All system activities and user actions" : "Your activity history"}
+                        {/* {isAdmin ? "All system activities and user actions" : "Your activity history"} */}
                     </p>
                 </div>
 
                 <div className="flex flex-col gap-2 sm:flex-row">
                     <Button variant="outline" onClick={handleExportCSV}>
-                        <Download className="mr-2 w-4 h-4" />
+                        <Download className="w-4 h-4 mr-2" />
                         Export CSV
                     </Button>
                     <Button variant="outline" onClick={handleExportPDF}>
-                        <FileText className="mr-2 w-4 h-4" />
+                        <FileText className="w-4 h-4 mr-2" />
                         Export PDF
                     </Button>
                 </div>
@@ -230,7 +225,7 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Search</label>
                             <div className="relative">
-                                <Search className="absolute top-3 left-3 w-4 h-4 text-gray-400" />
+                                <Search className="absolute w-4 h-4 text-gray-400 top-3 left-3" />
                                 <Input
                                     placeholder="Search logs..."
                                     value={searchTerm}
@@ -260,11 +255,11 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="justify-start w-full font-normal text-left bg-transparent">
-                                        <CalendarIcon className="mr-2 w-4 h-4" />
+                                        <CalendarIcon className="w-4 h-4 mr-2" />
                                         {dateFrom ? moment(dateFrom).format("DD/MM/YYYY") : "Pick a date"}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="p-0 w-auto">
+                                <PopoverContent className="w-auto p-0">
                                     <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus />
                                 </PopoverContent>
                             </Popover>
@@ -275,11 +270,11 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="outline" className="justify-start w-full font-normal text-left bg-transparent">
-                                        <CalendarIcon className="mr-2 w-4 h-4" />
+                                        <CalendarIcon className="w-4 h-4 mr-2" />
                                         {dateTo ? moment(dateTo).format("DD/MM/YYYY") : "Pick a date"}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="p-0 w-auto">
+                                <PopoverContent className="w-auto p-0">
                                     <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus />
                                 </PopoverContent>
                             </Popover>
@@ -293,7 +288,7 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
                 <CardHeader>
                     <CardTitle>Activity Log</CardTitle>
                     <CardDescription>
-                        Showing {filteredLogs.length} of {logs.length} log entries
+                        {/* Showing {filteredLogs.length} of {logs.length} log entries */}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -310,7 +305,7 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {filteredLogs.length === 0 ? (
+                                {/* {filteredLogs.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="py-8 text-center text-gray-500">
                                             No logs found matching your criteria
@@ -332,7 +327,7 @@ export default function AuditLogsTab({ currentUser }: AuditLogsTabProps) {
                                             <TableCell>{getStatusBadge(log.status)}</TableCell>
                                         </TableRow>
                                     ))
-                                )}
+                                )} */}
                             </TableBody>
                         </Table>
                     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 
 import { } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge } from "@/components/ui"
@@ -9,76 +9,15 @@ import ShipmentItemScannerButton from "@/components/app/button/shipment-item-sca
 import moment from "moment"
 import { ShipmentStatus } from "@/types"
 
-interface ShipmentsTabProps {
-    currentUser: "admin" | "user"
-    onShipmentSelect: (shipmentId: string) => void
-}
-
-export default function ShipmentsTab({ currentUser }: ShipmentsTabProps) {
+export default function ShipmentsTab() {
     const [scannedData, setScannedData] = useState<string | null>(null); // Dữ liệu quét từ GM65
-    const [isListeningForScanner, setIsListeningForScanner] = useState(false); // Lắng nghe input từ scanner
     const { shipments } = useShipmentStore();
-
-    const scannerInputRef = useRef<string>(''); // Lưu input từ scanner
-    const scannerTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Timeout để phát hiện kết thúc scan
 
     const handleSetShipmentSuccess = () => {
         setScannedData(null); // Reset sau khi đã xử lý dữ liệu
-        setIsListeningForScanner(false); // Dừng lắng nghe scanner
     }
 
-    // Xử lý input từ mắt đọc GM65
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-            // Chỉ xử lý khi đang lắng nghe scanner
-            if (isListeningForScanner) {
-                // GM65 thường kết thúc bằng Enter hoặc Tab
-                if (event.key === 'Enter' || event.key === 'Tab') {
-                    if (scannerInputRef.current.trim()) {
-                        setScannedData(scannerInputRef.current.trim());
-                        setIsListeningForScanner(false);
-                        scannerInputRef.current = '';
-
-                        // Clear timeout
-                        if (scannerTimeoutRef.current) {
-                            clearTimeout(scannerTimeoutRef.current);
-                            scannerTimeoutRef.current = null;
-                        }
-                    }
-                    event.preventDefault();
-                } else if (event.key.length === 1 || event.key === 'Shift' || event.key === 'Control') {
-                    // Chỉ nhận các ký tự có thể in được và một số phím đặc biệt
-                    if (event.key.length === 1) {
-                        scannerInputRef.current += event.key;
-
-                        // Clear timeout cũ và tạo timeout mới
-                        if (scannerTimeoutRef.current) {
-                            clearTimeout(scannerTimeoutRef.current);
-                        }
-
-                        // Nếu không có input trong 1000ms, reset (GM65 quét khá nhanh)
-                        scannerTimeoutRef.current = setTimeout(() => {
-                            scannerInputRef.current = '';
-                        }, 1000);
-                    }
-
-                    // Ngăn không cho input hiển thị trên page
-                    event.preventDefault();
-                }
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyPress);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyPress);
-            if (scannerTimeoutRef.current) {
-                clearTimeout(scannerTimeoutRef.current);
-            }
-        };
-    }, [isListeningForScanner]);
-
-    const isAdmin = currentUser === "admin"
+    // const isAdmin = currentUser === "admin"
     return (
         <div className="space-y-6">
             {/* Nút bật/tắt quét GM65 Scanner */}
@@ -142,7 +81,7 @@ export default function ShipmentsTab({ currentUser }: ShipmentsTabProps) {
                                 <CardHeader>
                                     <CardTitle>Danh sách vật tư</CardTitle>
                                     <CardDescription>
-                                        {isAdmin ? "Tất cả vật tư trong lô hàng" : "Vật tư của bạn"}
+                                        {"Tất cả vật tư trong lô hàng"}
                                     </CardDescription>
                                     <ShipmentItemScannerButton />
                                 </CardHeader>

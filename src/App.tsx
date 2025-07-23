@@ -1,41 +1,18 @@
 import { useState } from "react"
 import { Package, QrCode, LogOut, Settings } from "lucide-react"
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast'
 
 import { Button, Badge, Avatar, AvatarFallback, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ShipmentDetailTab, AuditLogsTab, UsersTab, ShipmentsTabUseGM65 } from "@/app/components"
+import { ShipmentDetailTab, ShipmentsTabUseGM65 } from "./app/components"
+// import { ShipmentDetailTab, ShipmentsTabUseGM65 } from "@/app/components"
 
-// Mock user data
-const mockUsers = {
-  admin: {
-    id: "admin-1",
-    name: "John Admin",
-    email: "admin@company.com",
-    role: "Admin",
-    initials: "JA",
-  },
-  user: {
-    id: "user-1",
-    name: "Sarah User",
-    email: "user@company.com",
-    role: "User",
-    initials: "SU",
-  },
-}
-
-export default function Component() {
-  const [currentUser] = useState<"admin" | "user">("admin")
+export default function App() {
+  // const [currentUser] = useState<"admin" | "user">("admin")
   const [activeTab, setActiveTab] = useState("shipments")
-  const [, setSelectedShipment] = useState<string | null>(null)
 
-  const user = mockUsers[currentUser]
-  const isAdmin = currentUser === "admin"
-
-  const handleShipmentSelect = (shipmentId: string) => {
-    setSelectedShipment(shipmentId)
-    setActiveTab("shipment-detail")
-  }
+  // const user = mockUsers[currentUser]
+  // const isAdmin = currentUser === "admin"
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,17 +36,17 @@ export default function Component() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative w-10 h-10 rounded-full">
                   <Avatar className="w-10 h-10">
-                    <AvatarFallback className="text-white bg-blue-600">{user.initials}</AvatarFallback>
+                    <AvatarFallback className="text-white bg-blue-600"></AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                    {/* <p className="font-medium">{user.name}</p> */}
+                    {/* <p className="text-xs text-muted-foreground">{user.email}</p> */}
                     <Badge variant="secondary" className="text-xs w-fit">
-                      {user.role}
+                      {/* {user.role} */}
                     </Badge>
                   </div>
                 </div>
@@ -112,22 +89,22 @@ export default function Component() {
           </TabsList>
 
           <TabsContent value="shipments" className="space-y-6">
-            <ShipmentsTabUseGM65 currentUser={currentUser} onShipmentSelect={handleShipmentSelect} />
+            <ShipmentsTabUseGM65 />
           </TabsContent>
 
           <TabsContent value="shipment-detail" className="space-y-6">
             <ShipmentDetailTab />
           </TabsContent>
 
-          <TabsContent value="audit-logs" className="space-y-6">
-            <AuditLogsTab currentUser={currentUser} />
-          </TabsContent>
+          {/* <TabsContent value="audit-logs" className="space-y-6">
+            <AuditLogsTab />
+          </TabsContent> */}
 
-          {isAdmin && (
+          {/* {isAdmin && (
             <TabsContent value="users" className="space-y-6">
               <UsersTab />
             </TabsContent>
-          )}
+          )} */}
         </Tabs>
       </main>
     </div>

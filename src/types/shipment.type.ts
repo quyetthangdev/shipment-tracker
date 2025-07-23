@@ -1,11 +1,18 @@
 import { IBase } from "./base.type"
 
+export enum ShipmentStatus {
+    PENDING = "pending",
+    IN_PROGRESS = "in_progress",
+    COMPLETED = "completed",
+    CANCELLED = "cancelled"
+}
+
 export interface IShipment extends IBase {
     id?: string // barcode or unique identifier
     name?: string
     trackingNumber?: string
     items?: IShipmentItem[]
-    status?: string
+    status?: ShipmentStatus
     origin?: string
     destination?: string
     creator?: string

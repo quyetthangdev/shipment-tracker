@@ -1,9 +1,11 @@
-import { IShipment, IShipmentItem } from "./shipment.type"
+import { IShipment, IShipmentItem, ShipmentStatus } from "./shipment.type"
 
 export interface IShipmentStore {
-  shipment?: IShipment
-  setShipment: (shipment?: IShipment) => void
-  addShipmentItem: (item: IShipmentItem) => void
-  removeShipmentItem: (itemId: string) => void
+  shipments: IShipment[]
+  setShipments: (shipments: IShipment[]) => void
+  addShipment: (shipment: IShipment) => void
+  addShipmentItem: (shipmentId: string, item: IShipmentItem) => void
+  updateShipmentStatus: (shipmentId: string, status: ShipmentStatus) => void
+  removeShipmentItem: (shipmentId: string, itemId: string) => void
   removeShipment: (shipmentId: string) => void
 }

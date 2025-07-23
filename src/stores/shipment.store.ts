@@ -1,47 +1,66 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { IShipment, IShipmentItem, IShipmentStore } from '@/types'
+import { IShipmentStore, ShipmentStatus } from '@/types'
 
 export const useShipmentStore = create<IShipmentStore>()(
   persist(
     (set) => ({
-      shipment: undefined,
+      shipments: [],
 
-      setShipment: (shipment?: IShipment) => set({ shipment }),
+      setShipments: (shipments) => set({ shipments }),
 
-      addShipmentItem: (item: IShipmentItem) =>
+      addShipment: (newShipment) =>
         set((state) => {
-          const existingItems = state.shipment?.items ?? []
-
-          return {
-            shipment: {
-              ...state.shipment!,
-              items: [...existingItems, item],
-            },
-          }
+          if (state.shipments.some(s => s.id === newShipment.id)) return state
+          return { shipments: [...state.shipments, newShipment] }
         }),
 
-      removeShipmentItem: (itemId: string) =>
+      addShipmentItem: (shipmentId, item) =>
+        set((state) => ({
+          shipments: state.shipments.map(s =>
+            s.id === shipmentId
+              ? {
+                  ...s,
+                  items: s.items?.some(i => i.id === item.id)
+                    ? s.items // đã có rồi thì giữ nguyên
+                    : [...(s.items ?? []), item],
+                }
+              : s
+          ),
+        })),
+
+      updateShipmentStatus: (shipmentId, status: ShipmentStatus) =>
         set((state) => {
-          if (!state.shipment) return state
+          const shipmentExists = state.shipments.some(s => s.id === shipmentId);
+          if (!shipmentExists) return state;
 
           return {
-            shipment: {
-              ...state.shipment,
-              items: state.shipment.items?.filter((item) => item.id !== itemId) || [],
-            },
-          }
+            shipments: state.shipments.map(s =>
+              s.id === shipmentId ? { ...s, status } : s
+            ),
+          };
         }),
 
-      removeShipment: (shipmentId: string) => set((state) => {
-        if (!state.shipment || state.shipment.id !== shipmentId) return state
-        return {
-          shipment: undefined,
-        }
-      }),
+      removeShipmentItem: (shipmentId, itemId) =>
+      {
+        console.log("Removing item:", itemId, "from shipment:", shipmentId);
+        set((state) => ({
+          shipments: state.shipments.map(s =>
+            s.id === shipmentId
+              ? {
+                  ...s,
+                  items: s.items?.filter(i => i.id !== itemId) ?? [],
+                }
+              : s
+          ),
+        })
+      )},
+
+      removeShipment: (shipmentId) =>
+        set((state) => ({
+          shipments: state.shipments.filter(s => s.id !== shipmentId),
+        })),
     }),
-    {
-      name: 'shipment-storage',
-    }
+    { name: 'shipment-storage' }
   )
 )

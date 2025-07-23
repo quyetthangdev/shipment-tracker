@@ -14,34 +14,20 @@ import {
     Input,
     Label
 } from "@/components/ui"
-import { IShipment } from "@/types"
-import { useCreatedShipmentStore } from "@/stores/created-shipment.store";
+import { IShipment, ShipmentStatus } from "@/types"
 import { useShipmentStore } from "@/stores";
 
 export default function ConfirmCreateShipmentDialog({ shipment, disabled }: { shipment?: IShipment, disabled?: boolean }) {
     const [isOpen, setIsOpen] = useState(false)
-    const { removeShipment } = useShipmentStore();
-    const { setCreatedShipment } = useCreatedShipmentStore()
+    const { updateShipmentStatus } = useShipmentStore()
 
     const handleSubmit = (shipment?: IShipment) => {
-        const shipmentData: IShipment = {
-            slug: shipment?.slug || '',
-            createdAt: shipment?.createdAt || new Date().toISOString(),
-            id: shipment?.id,
-            name: shipment?.name,
-            creator: shipment?.creator || "Nguyen Van A", // Example creator, replace with actual logic
-            trackingNumber: shipment?.trackingNumber || "",
-            items: shipment?.items || [],
-            status: shipment?.status || "",
-            origin: shipment?.origin || "",
-            destination: shipment?.destination || ""
-        }
         // Here you can handle the shipment creation logic
         toast.success(`Shipment ${shipment?.id} created successfully!`)
-        setCreatedShipment(shipmentData)
-        removeShipment(shipment?.id || '');
+        updateShipmentStatus(shipment?.id || '', ShipmentStatus.IN_PROGRESS);
         setIsOpen(false)
     }
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger className="flex items-center justify-center w-full" asChild>

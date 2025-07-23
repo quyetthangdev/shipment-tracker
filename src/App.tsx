@@ -93,11 +93,11 @@ export default function Component() {
           <TabsList className="grid w-full grid-cols-2 gap-4 sm:grid-cols-4">
             <TabsTrigger value="shipments" className="flex items-center space-x-2">
               <Package className="w-4 h-4" />
-              <span className="hidden sm:inline">Shipments</span>
+              <span>Tạo lô hàng</span>
             </TabsTrigger>
             <TabsTrigger value="shipment-detail" className="flex items-center space-x-2">
               <QrCode className="w-4 h-4" />
-              <span className="hidden sm:inline">Detail</span>
+              <span>Lịch sử</span>
             </TabsTrigger>
             {/* <TabsTrigger value="audit-logs" className="flex items-center space-x-2">
               <FileText className="w-4 h-4" />

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui'
 import { useShipmentStore } from '@/stores'
 
-export default function ConfirmClearShipmentDialog({ shipmentId }: { shipmentId: string }) {
+export default function ConfirmClearShipmentDialog({ shipmentId }: { shipmentId?: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const { removeShipment } = useShipmentStore()
 
@@ -50,7 +50,7 @@ export default function ConfirmClearShipmentDialog({ shipmentId }: { shipmentId:
                     <Button
                         variant="destructive"
                         className="w-full sm:w-auto"
-                        onClick={() => handleDeleteShipment(shipmentId)}
+                        onClick={() => handleDeleteShipment(shipmentId || '')}
                     >
                         Xóa
                     </Button>

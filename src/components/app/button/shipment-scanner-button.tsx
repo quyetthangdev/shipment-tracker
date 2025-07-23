@@ -15,7 +15,6 @@ export default function ShipmentScannerButton({ onSuccess }: { onSuccess: (data:
                 // GM65 thường kết thúc bằng Enter hoặc Tab
                 if (event.key === 'Enter' || event.key === 'Tab') {
                     if (scannerInputRef.current.trim()) {
-                        console.log("✅ Scanner result:", scannerInputRef.current);
                         onSuccess(scannerInputRef.current.trim()); // Gọi callback khi có dữ liệu
                         setIsListeningForScanner(false);
                         scannerInputRef.current = '';
@@ -75,7 +74,7 @@ export default function ShipmentScannerButton({ onSuccess }: { onSuccess: (data:
                     setIsListeningForScanner(true);
                 }
             }}
-            className={`w-full ${isListeningForScanner ? "bg-red-600 hover:bg-red-700" : ""
+            className={`w-full ${isListeningForScanner ? "bg-destructive hover:bg-red-700" : ""
                 }`}
         >
             {isListeningForScanner ? "Dừng scan" : "Bắt đầu scan"}

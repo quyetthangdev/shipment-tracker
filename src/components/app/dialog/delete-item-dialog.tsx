@@ -14,14 +14,18 @@ import {
 } from '@/components/ui'
 import { useShipmentStore } from '@/stores'
 
-export default function LogoutDialog({ item }: { item: string }) {
+export default function DeleteItemDialog({ item, shipmentId }: { item?: string, shipmentId?: string }) {
     const [isOpen, setIsOpen] = useState(false)
     const { removeShipmentItem } = useShipmentStore()
 
-    const handleDeleteItem = (item: string) => {
-        removeShipmentItem(item)
+    const handleDeleteItem = (shipmentId?: string, item?: string) => {
+        if (!shipmentId || !item) {
+            toast.error("Không có lô hàng để xóa vật tư")
+            return
+        }
+        removeShipmentItem(shipmentId, item)
         setIsOpen(false)
-        toast.success(`Đã xóa vật tư ${item} khỏi đơn hàng`)
+        toast.success(`Đã xóa vật tư ${item} khỏi đơn hàng ${shipmentId}`)
     }
 
     return (
@@ -51,7 +55,7 @@ export default function LogoutDialog({ item }: { item: string }) {
                     <Button
                         variant="destructive"
                         className="w-full sm:w-auto"
-                        onClick={() => handleDeleteItem(item)}
+                        onClick={() => handleDeleteItem(shipmentId, item)}
                     >
                         Xóa
                     </Button>

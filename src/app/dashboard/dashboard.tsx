@@ -21,7 +21,7 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <header className="px-4 py-3 bg-white border-b border-gray-200">
+            <header className="sticky top-0 z-40 px-4 py-3 bg-white border-b border-gray-200">
                 <div className="flex items-center justify-between mx-auto max-w-7xl">
                     <div className="flex items-center space-x-3">
                         <div className="p-2 bg-blue-600 rounded-lg">

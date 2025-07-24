@@ -31,46 +31,6 @@ export default function ShipmentDetailTab() {
     const { shipments } = useShipmentStore()
     const printRef = useRef<HTMLDivElement>(null);
 
-    // const handleExportPDF = async (shipment: IShipment) => {
-    //     try {
-    //         let allHtmlContent = '';
-
-    //         for (const item of shipment.items) {
-    //             const html = await generateShipmentHTML({
-    //                 logoString: Be_Vietnam_Pro_base64,
-    //                 slug: shipment.slug,
-    //                 id: item.id,
-    //                 creator: item.creator,
-    //                 createdAt: item.createdAt,
-    //                 items: shipment.items,
-    //             });
-
-    //             allHtmlContent += html;
-    //         }
-
-    //         // Gán nội dung vào ref, sau đó render rồi mới export
-    //         if (printRef.current) {
-    //             printRef.current.innerHTML = allHtmlContent;
-
-    //             const pdf = await ReactToPdf(() => printRef.current!, {
-    //                 filename: `shipment-${shipment.slug || shipment.id || 'export'}.pdf`,
-    //             });
-
-    //             await pdf.save();
-    //         }
-    //     } catch (err) {
-    //         console.error(err);
-    //         toast.error("Lỗi khi tạo nội dung PDF");
-    //     }
-    // };
-
-
-    // const handleExportPDF = (shipment: IShipment) => {
-    //     console.log("Exporting shipment details as CSV", shipment);
-    //     // Logic to export shipment details as CSV
-    // }
-
-    // Hàm định dạng giá trị thành ô CSV, escape dấu " và bao trong dấu "
 
     const handleExportPDF = (shipment: IShipment) => {
         const doc = new jsPDF()
@@ -144,8 +104,6 @@ export default function ShipmentDetailTab() {
         // Tải về file
         doc.save(`phieu-dong-goi-${shipment.id}.pdf`)
     }
-
-
 
     const handleExportExcel = async (shipment: IShipment) => {
         try {
@@ -273,7 +231,7 @@ export default function ShipmentDetailTab() {
                 return (<div>
                     <div>
                         {/* Shipment Info Cards */}
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                        <div className="grid grid-cols-1 pb-4">
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                                     <CardTitle className="text-sm font-medium">Trạng thái</CardTitle>

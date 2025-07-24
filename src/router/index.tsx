@@ -6,6 +6,7 @@ import { LoginPage, DashboardPage } from "./loadable";
 import { ROUTES } from "@/constants";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
+import { Spinner } from "@/app/components";
 
 export const router = createBrowserRouter([
     {
@@ -17,7 +18,7 @@ export const router = createBrowserRouter([
         path: ROUTES.LOGIN,
         element: (
             <PublicRoute>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<Spinner />}>
                     <LoginPage />
                 </Suspense>
             </PublicRoute>

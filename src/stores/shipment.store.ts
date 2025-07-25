@@ -6,6 +6,8 @@ export const useShipmentStore = create<IShipmentStore>()(
   persist(
     (set) => ({
       shipments: [],
+      activeShipmentId: null,
+      setActiveShipmentId: (id) => set({ activeShipmentId: id }),
 
       setShipments: (shipments) => set({ shipments }),
 

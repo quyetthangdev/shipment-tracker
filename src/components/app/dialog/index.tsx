@@ -2,3 +2,5 @@ export { default as ConfirmCreateShipmentDialog } from "./confirm-create-shipmen
 export { default as ConfirmClearShipmentDialog } from "./confirm-clear-shipment-dialog"
 export { default as DeleteItemDialog } from "./delete-item-dialog"
 export { default as ShipmentsNumberDialog } from "./shipment-no-dialog"
+export { default as ManualShipmentInitDialog } from "./manual-shipment-init-dialog"
+export { default as DialogDemo } from "./dislos-test"

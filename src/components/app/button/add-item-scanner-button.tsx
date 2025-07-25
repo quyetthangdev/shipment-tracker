@@ -29,7 +29,7 @@ export default function AddItemScannerButton({ activeShipmentId }: AddItemScanne
                     const isDuplicate = existingItems.some(item => item.id === code);
 
                     if (isDuplicate) {
-                        toast.error(`Mã QR ${code} đã tồn tại trong shipment`);
+                        toast.error(`Mã ${code} đã tồn tại trong lô hàng ${activeShipmentId}`);
                     } else {
                         const newItem: IShipmentItem = {
                             createdAt: new Date().toISOString(),
@@ -37,7 +37,7 @@ export default function AddItemScannerButton({ activeShipmentId }: AddItemScanne
                             creator: "Nguyen Van A", // Thay thế bằng logic thực tế
                         }
                         addShipmentItem(activeShipmentId, newItem);
-                        toast.success(`Đã thêm item ${code} vào shipment ${activeShipmentId}`);
+                        toast.success(`Đã thêm vật tư ${code} vào lô hàng ${activeShipmentId}`);
                     }
 
                     scannerInputRef.current = '';
@@ -90,7 +90,7 @@ export default function AddItemScannerButton({ activeShipmentId }: AddItemScanne
             disabled={activeShipment.status === ShipmentStatus.COMPLETED}
         >
             <Package className="w-4 h-4" />
-            {isListeningForScanner ? "Dừng scan item" : "Scan thêm item"}
+            {isListeningForScanner ? "Dừng quét" : "Quét thêm vật tư"}
         </Button>
     );
 }

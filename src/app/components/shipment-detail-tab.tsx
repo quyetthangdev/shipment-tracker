@@ -31,6 +31,22 @@ export default function ShipmentDetailTab() {
     const { shipments } = useShipmentStore()
     const printRef = useRef<HTMLDivElement>(null);
 
+    const getStatusText = (status?: string) => {
+        if (!status) return "Không xác định";
+        switch (status) {
+            case ShipmentStatus.PENDING:
+                return "Chờ xử lý"
+            case ShipmentStatus.IN_PROGRESS:
+                return "Đang xử lý"
+            case ShipmentStatus.COMPLETED:
+                return "Hoàn tất"
+            case ShipmentStatus.CANCELLED:
+                return "Đã hủy"
+            default:
+                return "Không xác định"
+        }
+    }
+
 
     const handleExportPDF = (shipment: IShipment) => {
         const doc = new jsPDF()
@@ -52,7 +68,7 @@ export default function ShipmentDetailTab() {
             [`Tên lô hàng:`, shipment.name],
             [`Người tạo:`, shipment.creator],
             [`Ngày tạo:`, createdDate],
-            [`Trạng thái:`, shipment.status],
+            [`Trạng thái:`, getStatusText(shipment.status)],
             [`Mã theo dõi:`, shipment.trackingNumber],
         ]
 
@@ -211,10 +227,7 @@ export default function ShipmentDetailTab() {
             <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                     <AlertTriangle className="w-12 h-12 mb-4 text-red-400" />
-                    <h3 className="mb-2 text-lg font-medium text-gray-900">Không tìm thấy lô hàng</h3>
-                    <p className="text-center text-gray-600">
-                        Lô hàng đã chọn không thể tìm thấy hoặc bạn không có quyền truy cập.
-                    </p>
+                    <h3 className="mb-2 text-lg font-medium text-gray-900">Không tìm thấy lô hàng nào!</h3>
                 </CardContent>
             </Card>
         )
@@ -253,24 +266,24 @@ export default function ShipmentDetailTab() {
                         {/* QR Scans Table */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>QR Scan History</CardTitle>
-                                <CardDescription>All QR codes scanned for this shipment, including duplicates</CardDescription>
+                                <CardTitle>Lịch sử quét QR</CardTitle>
+                                <CardDescription>Tất cả mã QR đã quét cho lô hàng này, bao gồm cả bản sao</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="overflow-x-auto">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>QR Code</TableHead>
-                                                <TableHead>Scan Time</TableHead>
-                                                <TableHead>Scanned By</TableHead>
+                                                <TableHead>Mã QR</TableHead>
+                                                <TableHead>Thời gian quét</TableHead>
+                                                <TableHead>Người quét</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {createdShipment && createdShipment?.items && createdShipment.items.length === 0 ? (
                                                 <TableRow>
                                                     <TableCell colSpan={5} className="py-8 text-center text-gray-500">
-                                                        No QR codes scanned yet
+                                                        Chưa có mã QR nào được quét
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
@@ -288,11 +301,11 @@ export default function ShipmentDetailTab() {
                                 <div className="grid grid-cols-2 gap-2 mt-4">
 
                                     <Button onClick={() => handleExportPDF(createdShipment)}>
-                                        <span className="text-sm">Export PDF</span>
+                                        <span className="text-sm">Xuất PDF</span>
                                     </Button>
                                     <div ref={printRef} style={{ display: 'none' }} />
                                     <Button variant="outline" className="ml-2" onClick={() => handleExportExcel(createdShipment)} >
-                                        <span className="text-sm">Export Excel</span>
+                                        <span className="text-sm">Xuất Excel</span>
                                     </Button>
                                 </div>
                             </CardContent>

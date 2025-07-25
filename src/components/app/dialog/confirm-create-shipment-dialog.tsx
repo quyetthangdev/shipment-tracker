@@ -1,5 +1,6 @@
 import { useState } from "react"
 import toast from 'react-hot-toast';
+import { useNavigate } from "react-router-dom"
 
 import {
     Button,
@@ -17,14 +18,20 @@ import {
 import { IShipment, ShipmentStatus } from "@/types"
 import { useShipmentStore } from "@/stores";
 
-export default function ConfirmCreateShipmentDialog({ shipment, disabled }: { shipment?: IShipment, disabled?: boolean }) {
+export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSuccess }: { shipment?: IShipment, disabled?: boolean, onSuccess?: () => void }) {
     const [isOpen, setIsOpen] = useState(false)
     const { updateShipmentStatus } = useShipmentStore()
+    const navigate = useNavigate()
 
     const handleSubmit = (shipment?: IShipment) => {
         // Here you can handle the shipment creation logic
-        toast.success(`Shipment ${shipment?.id} created successfully!`)
+        toast.success(`Lô hàng ${shipment?.id} đã được tạo thành công!`)
         updateShipmentStatus(shipment?.id || '', ShipmentStatus.IN_PROGRESS);
+
+        // Clear code parameter from URL
+        navigate('/dashboard', { replace: true })
+        onSuccess?.();
+
         setIsOpen(false)
     }
 

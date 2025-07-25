@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
 import {
     Dialog,
@@ -13,20 +14,25 @@ import {
 } from '@/components/ui'
 import { useShipmentStore } from '@/stores'
 
-export default function ConfirmClearShipmentDialog({ shipmentId }: { shipmentId?: string }) {
+export default function ConfirmClearShipmentDialog({ shipmentId, disabled }: { shipmentId?: string, disabled?: boolean }) {
     const [isOpen, setIsOpen] = useState(false)
     const { removeShipment } = useShipmentStore()
+    const navigate = useNavigate()
 
     const handleDeleteShipment = (shipmentId: string) => {
         removeShipment(shipmentId)
         setIsOpen(false)
         toast.success(`Đã xóa lô hàng ${shipmentId}!`)
+
+        // Clear code parameter from URL after deleting shipment
+        navigate('/dashboard', { replace: true })
     }
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger className="flex items-center justify-center w-full" asChild>
                 <Button
+                    disabled={disabled}
                     variant="destructive"
                     className="w-full text-sm"
                     onClick={() => setIsOpen(true)}

@@ -9,9 +9,16 @@ import { useAuthStore } from "@/stores"
 import { ROUTES } from "@/constants"
 
 export default function DashboardPage() {
-    const [activeTab, setActiveTab] = useState("shipments")
+    const [activeTab, setActiveTab] = useState("shipments") // Luôn bắt đầu với tab "shipments"
     const { logout } = useAuthStore()
     const navigate = useNavigate()
+
+    // Không tự động chuyển tab nữa - để user tự chọn
+    // useEffect(() => {
+    //     if (shipmentCode) {
+    //         setActiveTab("shipment-detail")
+    //     }
+    // }, [shipmentCode])
 
     const handleLogout = () => {
         logout()

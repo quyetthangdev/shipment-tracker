@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui";
 
 export default function ShipmentScannerButton({
+    disabled,
     onSuccess,
 }: {
+    disabled: boolean;
     onSuccess: (data: string) => void;
 }) {
     const [isListeningForScanner, setIsListeningForScanner] = useState(false);
@@ -67,6 +69,7 @@ export default function ShipmentScannerButton({
         <Button
             onClick={toggleScan}
             className={`w-full ${isListeningForScanner ? "bg-destructive hover:bg-red-700" : ""}`}
+            disabled={disabled}
         >
             {isListeningForScanner ? "Dừng scan" : "Bắt đầu scan"}
         </Button>

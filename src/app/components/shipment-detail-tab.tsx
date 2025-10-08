@@ -224,9 +224,9 @@ export default function ShipmentDetailTab() {
 
     if (!shipments || shipments.length === 0) {
         return (
-            <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                    <AlertTriangle className="w-12 h-12 mb-4 text-red-400" />
+            <Card className="rounded-lg shadow-sm">
+                <CardContent className="flex flex-col justify-center items-center py-12">
+                    <AlertTriangle className="mb-4 w-12 h-12 text-red-400" />
                     <h3 className="mb-2 text-lg font-medium text-gray-900">Không tìm thấy lô hàng nào!</h3>
                 </CardContent>
             </Card>
@@ -234,86 +234,84 @@ export default function ShipmentDetailTab() {
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="px-3 space-y-6 max-w-7xl">
+            <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Thông tin chi tiết lô hàng</h2>
+                    <p className="mt-1 text-sm text-gray-600">Tổng cộng {shipments.length} lô hàng</p>
                 </div>
             </div>
-            {shipments.length !== 0 && shipments.map((createdShipment) => {
-                return (<div>
-                    <div>
-                        {/* Shipment Info Cards */}
-                        <div className="grid grid-cols-1 pb-4">
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                                    <CardTitle className="text-sm font-medium">Trạng thái</CardTitle>
+
+            {shipments.map((createdShipment, index) => (
+                <Card key={createdShipment.id || index} className="rounded-lg shadow-sm">
+                    <CardHeader className="bg-gray-50 border-b">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex-1">
+                                <div className="flex gap-3 items-center">
+                                    <CardTitle className="text-xl">{createdShipment.id}</CardTitle>
                                     <Badge
                                         variant={createdShipment.status === ShipmentStatus.COMPLETED ? "default" : "secondary"}
                                         className={createdShipment.status === ShipmentStatus.COMPLETED ? "bg-green-600" : "bg-yellow-500 text-white"}
                                     >
                                         {createdShipment.status === ShipmentStatus.COMPLETED ? "Hoàn thành" : "Đang xử lý"}
                                     </Badge>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{createdShipment.id}</div>
-                                    <p className="text-xs text-muted-foreground">Thời gian tạo: {moment(createdShipment.createdAt).format("HH:mm:ss DD/MM/YYYY")}</p>
-                                    <p className="text-xs text-muted-foreground">Người tạo: {createdShipment.creator}</p>
-                                </CardContent>
-                            </Card>
+                                </div>
+                                <div className="flex flex-col gap-2 mt-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:gap-4">
+                                    <span>👤 Người tạo: <strong>{createdShipment.creator}</strong></span>
+                                    <span>🕒 {moment(createdShipment.createdAt).format("HH:mm:ss DD/MM/YYYY")}</span>
+                                    <span>📦 <strong>{createdShipment.items?.length || 0}</strong> sản phẩm</span>
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button size="sm" onClick={() => handleExportPDF(createdShipment)}>
+                                    Xuất PDF
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => handleExportExcel(createdShipment)}>
+                                    Xuất Excel
+                                </Button>
+                            </div>
                         </div>
+                    </CardHeader>
 
-                        {/* QR Scans Table */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Lịch sử quét QR</CardTitle>
-                                <CardDescription>Tất cả mã QR đã quét cho lô hàng này, bao gồm cả bản sao</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Mã QR</TableHead>
-                                                <TableHead>Thời gian quét</TableHead>
-                                                <TableHead>Người quét</TableHead>
+                    <CardContent className="pt-4">
+                        <CardDescription className="mb-3">
+                            Lịch sử quét QR - Tất cả mã QR đã quét cho lô hàng này
+                        </CardDescription>
+                        <div className="overflow-x-auto rounded-lg border shadow-sm">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-16">STT</TableHead>
+                                        <TableHead>Mã QR</TableHead>
+                                        <TableHead>Thời gian quét</TableHead>
+                                        <TableHead>Người quét</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {createdShipment?.items && createdShipment.items.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="py-8 text-center text-gray-500">
+                                                Chưa có mã QR nào được quét
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        createdShipment?.items && createdShipment.items.map((item, itemIndex) => (
+                                            <TableRow key={item.id}>
+                                                <TableCell className="font-medium">{itemIndex + 1}</TableCell>
+                                                <TableCell className="font-mono text-sm">{item.id}</TableCell>
+                                                <TableCell>{moment(item.createdAt).format("HH:mm:ss DD/MM/YYYY")}</TableCell>
+                                                <TableCell className="text-sm">{item.creator}</TableCell>
                                             </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {createdShipment && createdShipment?.items && createdShipment.items.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell colSpan={5} className="py-8 text-center text-gray-500">
-                                                        Chưa có mã QR nào được quét
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : (
-                                                createdShipment?.items && createdShipment.items.map((item) => (
-                                                    <TableRow key={item.id}>
-                                                        <TableCell className="font-mono text-sm">{item.id}</TableCell>
-                                                        <TableCell>{moment(item.createdAt).format("HH:mm:ss DD/MM/YYYY")}</TableCell>
-                                                        <TableCell className="text-sm">{item.creator}</TableCell>
-                                                    </TableRow>
-                                                ))
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                                <div className="grid grid-cols-2 gap-2 mt-4">
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
 
-                                    <Button onClick={() => handleExportPDF(createdShipment)}>
-                                        <span className="text-sm">Xuất PDF</span>
-                                    </Button>
-                                    <div ref={printRef} style={{ display: 'none' }} />
-                                    <Button variant="outline" className="ml-2" onClick={() => handleExportExcel(createdShipment)} >
-                                        <span className="text-sm">Xuất Excel</span>
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-                )
-            })}
+            <div ref={printRef} style={{ display: 'none' }} />
         </div>
     )
 }

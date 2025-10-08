@@ -16,26 +16,40 @@ const LoginPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const success = login(username, password);
+        const trimmedUsername = username.trim();
+        const success = login(trimmedUsername, password);
+
+        console.log('Login attempt:', { trimmedUsername, success });
+
         if (success) {
+            console.log('Login success! Username:', trimmedUsername);
+            console.log('ROUTES.ADMIN:', ROUTES.ADMIN);
+            console.log('ROUTES.DASHBOARD:', ROUTES.DASHBOARD);
+
+            if (trimmedUsername === 'admin') {
+                console.log('Navigating to ADMIN route...');
+                navigate(ROUTES.ADMIN, { replace: true });
+            } else {
+                console.log('Navigating to DASHBOARD route...');
+                navigate(ROUTES.DASHBOARD, { replace: true });
+            }
             toast.success('Đăng nhập thành công!');
-            navigate(ROUTES.DASHBOARD);
         } else {
             setError('Tên đăng nhập hoặc mật khẩu không đúng');
         }
     };
 
     return (
-        <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-blue-100 via-white to-blue-200">
+        <div className="flex overflow-hidden relative justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-200">
             {/* Background Image */}
             <img
                 src={LoginBackground}
                 alt="Background"
-                className="absolute inset-0 object-cover w-full h-full"
+                className="object-cover absolute inset-0 w-full h-full"
             />
 
             {/* Overlay Gradient & Blur */}
-            {/* <div className="absolute inset-0 bg-white/0 backdrop-blur-md" /> */}
+            {/* <div className="absolute inset-0 backdrop-blur-md bg-white/0" /> */}
 
             {/* Glassmorphism Form */}
             <form
@@ -49,7 +63,7 @@ const LoginPage = () => {
                 <div className="mb-4">
                     <label className="block mb-1 text-sm">Tài khoản</label>
                     <input
-                        className="w-full p-3 border rounded-md outline-none bg-white/30 placeholder-white/70 border-white/30 focus:ring-2 focus:ring-white/50"
+                        className="p-3 w-full rounded-md border outline-none bg-white/30 placeholder-white/70 border-white/30 focus:ring-2 focus:ring-white/50"
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -60,7 +74,7 @@ const LoginPage = () => {
                 <div className="mb-4">
                     <label className="block mb-1 text-sm">Mật khẩu</label>
                     <input
-                        className="w-full p-3 border rounded-md outline-none bg-white/30 placeholder-white/70 border-white/30 focus:ring-2 focus:ring-white/50"
+                        className="p-3 w-full rounded-md border outline-none bg-white/30 placeholder-white/70 border-white/30 focus:ring-2 focus:ring-white/50"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -72,7 +86,7 @@ const LoginPage = () => {
 
                 <Button
                     type="submit"
-                    className="w-full py-3 mt-2 font-semibold text-white transition-all duration-300 bg-blue-600 rounded-md shadow-md hover:bg-blue-700 hover:shadow-lg"
+                    className="py-3 mt-2 w-full font-semibold text-white bg-blue-600 rounded-md shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg"
                 >
                     Đăng nhập
                 </Button>

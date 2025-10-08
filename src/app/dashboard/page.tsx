@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Package, QrCode, LogOut, Settings } from "lucide-react"
+import { Package, QrCode, LogOut, Settings, User } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { Button, Badge, Avatar, AvatarFallback, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui"
@@ -8,17 +8,10 @@ import { ShipmentDetailTab, ShipmentsTabUseGM65 } from "../components"
 import { useAuthStore } from "@/stores"
 import { ROUTES } from "@/constants"
 
-export default function DashboardPage() {
+export default function EmployeePage() {
     const [activeTab, setActiveTab] = useState("shipments") // Luôn bắt đầu với tab "shipments"
     const { logout } = useAuthStore()
     const navigate = useNavigate()
-
-    // Không tự động chuyển tab nữa - để user tự chọn
-    // useEffect(() => {
-    //     if (shipmentCode) {
-    //         setActiveTab("shipment-detail")
-    //     }
-    // }, [shipmentCode])
 
     const handleLogout = () => {
         logout()
@@ -29,7 +22,7 @@ export default function DashboardPage() {
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
             <header className="sticky top-0 z-40 px-4 py-3 bg-white border-b border-gray-200">
-                <div className="flex items-center justify-between mx-auto max-w-7xl">
+                <div className="flex justify-between items-center mx-auto max-w-7xl">
                     <div className="flex items-center space-x-3">
                         <div className="p-2 bg-blue-600 rounded-lg">
                             <QrCode className="w-6 h-6 text-white" />
@@ -45,27 +38,27 @@ export default function DashboardPage() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative w-10 h-10 rounded-full">
                                     <Avatar className="w-10 h-10">
-                                        <AvatarFallback className="text-white bg-blue-600"></AvatarFallback>
+                                        <AvatarFallback className="text-white bg-blue-600">
+                                            <User className="w-4 h-4" />
+                                        </AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end">
-                                <div className="flex items-center justify-start gap-2 p-2">
+                                <div className="flex gap-2 justify-start items-center p-2">
                                     <div className="flex flex-col space-y-1 leading-none">
-                                        {/* <p className="font-medium">{user.name}</p> */}
-                                        {/* <p className="text-xs text-muted-foreground">{user.email}</p> */}
                                         <Badge variant="secondary" className="text-xs w-fit">
                                             {/* {user.role} */}
                                         </Badge>
                                     </div>
                                 </div>
                                 <DropdownMenuItem>
-                                    <Settings className="w-4 h-4 mr-2" />
-                                    Settings
+                                    <Settings className="mr-2 w-4 h-4" />
+                                    Cài đặt
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={handleLogout}>
-                                    <LogOut className="w-4 h-4 mr-2" />
-                                    Log out
+                                    <LogOut className="mr-2 w-4 h-4" />
+                                    Đăng xuất
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -74,18 +67,21 @@ export default function DashboardPage() {
             </header>
 
             {/* Main Content */}
-            <main className="px-4 py-6 mx-auto max-w-7xl">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-2 gap-4 sm:grid-cols-4">
-                        <TabsTrigger value="shipments" className="flex items-center space-x-2">
-                            <Package className="w-4 h-4" />
-                            <span>Tạo lô hàng</span>
-                        </TabsTrigger>
-                        <TabsTrigger value="shipment-detail" className="flex items-center space-x-2">
-                            <QrCode className="w-4 h-4" />
-                            <span>Lịch sử</span>
-                        </TabsTrigger>
-                    </TabsList>
+            <main className="pb-6 mx-auto max-w-7xl">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    {/* Sticky Tabs Navigation */}
+                    <div className="sticky top-[81px] z-30 pb-4 px-4 pt-0 bg-gray-50">
+                        <TabsList className="grid grid-cols-2 mx-auto w-full max-w-md shadow-sm">
+                            <TabsTrigger value="shipments" className="flex gap-2 justify-center items-center">
+                                <Package className="w-4 h-4" />
+                                <span>Tạo lô hàng</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="shipment-detail" className="flex gap-2 justify-center items-center">
+                                <QrCode className="w-4 h-4" />
+                                <span>Lịch sử</span>
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
 
                     <TabsContent value="shipments" className="space-y-6">
                         <ShipmentsTabUseGM65 />

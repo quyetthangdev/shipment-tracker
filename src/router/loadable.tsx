@@ -8,8 +8,15 @@ export const LoginPage = React.lazy(() =>
 )
 
 //Dashboard
-export const DashboardPage = React.lazy(() =>
+export const EmployeePage = React.lazy(() =>
     import('@/app/dashboard').then((module) => ({
-        default: module.DashboardPage,
+        default: module.EmployeePage,
+    })),
+)
+
+//Admin
+export const AdminPage = React.lazy(() =>
+    import('@/app/admin').then((module) => ({
+        default: module.AdminPage,
     })),
 )

@@ -10,7 +10,7 @@ export default function ManualShipmentInput({ onSuccess, disabled }: { onSuccess
     return (
         <div className="flex items-center space-x-2">
             <Input type="text" placeholder="Mã lô hàng" value={shipmentId} onChange={(e) => setShipmentId(e.target.value)} />
-            <Button onClick={handleSubmit} disabled={disabled}>Tạo lô hàng</Button>
+            <Button onClick={handleSubmit} disabled={disabled || shipmentId.length === 0}>Tạo lô hàng</Button>
         </div>
     );
 }

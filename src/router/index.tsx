@@ -1,17 +1,18 @@
 import { Suspense } from "react";
 import ErrorPage from "@/error-page";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
-import { LoginPage, DashboardPage } from "./loadable";
+import { LoginPage, EmployeePage, AdminPage } from "./loadable";
 import { ROUTES } from "@/constants";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PublicRoute } from "@/components/PublicRoute";
+import { HomeRedirect } from "@/components/HomeRedirect";
 import { Spinner } from "@/app/components";
 
 export const router = createBrowserRouter([
     {
         path: ROUTES.HOME,
-        element: <Navigate to={ROUTES.DASHBOARD} replace />,
+        element: <HomeRedirect />,
         errorElement: <ErrorPage />,
     },
     {
@@ -30,7 +31,18 @@ export const router = createBrowserRouter([
         element: (
             <ProtectedRoute>
                 <Suspense fallback={<div>Loading...</div>}>
-                    <DashboardPage />
+                    <EmployeePage />
+                </Suspense>
+            </ProtectedRoute>
+        ),
+        errorElement: <ErrorPage />,
+    },
+    {
+        path: ROUTES.ADMIN,
+        element: (
+            <ProtectedRoute>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <AdminPage />
                 </Suspense>
             </ProtectedRoute>
         ),

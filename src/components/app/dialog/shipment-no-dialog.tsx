@@ -26,9 +26,9 @@ export default function ShipmentNumberDialog({ shipmentId, onClose }: { shipment
     const existingShipment = shipments.find(s => s.id === shipmentId)
     const shipmentStatus = existingShipment?.status
 
-    const isPending = shipmentStatus === ShipmentStatus.PENDING
-    const isBlocked = existingShipment && !isPending
-    const canContinue = existingShipment && isPending
+    const isInProgress = shipmentStatus === ShipmentStatus.IN_PROGRESS
+    const isBlocked = existingShipment && !isInProgress
+    const canContinue = existingShipment && isInProgress
     const isNew = !existingShipment
 
     useEffect(() => {
@@ -67,7 +67,7 @@ export default function ShipmentNumberDialog({ shipmentId, onClose }: { shipment
                 creator: "Nguyen Van A", // Thay bằng giá trị thực tế
                 trackingNumber: shipmentId,
                 items: [],
-                status: ShipmentStatus.PENDING,
+                status: ShipmentStatus.IN_PROGRESS,
                 origin: "",
                 destination: ""
             }
@@ -104,7 +104,7 @@ export default function ShipmentNumberDialog({ shipmentId, onClose }: { shipment
                             <Input id="name-1" value={shipmentId} readOnly />
                         </div>
                         {canContinue && existingShipment && (
-                            <div className="grid gap-3 p-3 border border-yellow-200 rounded-md bg-yellow-50">
+                            <div className="grid gap-3 p-3 bg-yellow-50 rounded-md border border-yellow-200">
                                 <div className="text-sm">
                                     <div><strong>Thông tin lô hàng:</strong></div>
                                     <div>Tên: {existingShipment.name || 'Chưa có tên'}</div>
@@ -115,7 +115,7 @@ export default function ShipmentNumberDialog({ shipmentId, onClose }: { shipment
                             </div>
                         )}
                     </div>
-                    <DialogFooter className="grid justify-between grid-cols-2 gap-2">
+                    <DialogFooter className="grid grid-cols-2 gap-2 justify-between">
                         <DialogClose asChild>
                             <Button variant="outline" onClick={onClose}>Hủy</Button>
                         </DialogClose>

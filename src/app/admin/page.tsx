@@ -201,7 +201,7 @@ export default function AdminPage() {
             <main className="px-4 pb-6 mx-auto max-w-7xl">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     {/* Sticky Tabs Navigation */}
-                    <div className="sticky top-[81px] z-30 pb-4 -mx-4 px-4 pt-0 bg-gray-50">
+                    <div className="sticky top-[65px] z-30 pt-4 pb-4 -mx-4 px-4 bg-gray-50">
                         <TabsList className="grid grid-cols-3 w-full max-w-2xl shadow-sm">
                             <TabsTrigger value="users" className="flex gap-2 items-center">
                                 <UsersIcon className="w-4 h-4" />
@@ -269,14 +269,14 @@ export default function AdminPage() {
 
                             <Card className="rounded-lg shadow-sm">
                                 <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                                    <CardTitle className="text-sm font-medium">Quản trị viên của hệ thống</CardTitle>
+                                    <CardTitle className="text-sm font-medium">Quản lý của hệ thống</CardTitle>
                                     <UsersIcon className="w-4 h-4 text-purple-600" />
                                 </CardHeader>
                                 <CardContent>
                                     <div className="text-2xl font-bold text-purple-600">
                                         {filteredUsers.filter((u) => u.role === "Admin").length}
                                     </div>
-                                    <p className="text-xs text-muted-foreground">Quản trị viên</p>
+                                    <p className="text-xs text-muted-foreground">Quản lý</p>
                                 </CardContent>
                             </Card>
 
@@ -313,8 +313,8 @@ export default function AdminPage() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">Tất cả vai trò</SelectItem>
-                                            <SelectItem value="Admin">Admin</SelectItem>
-                                            <SelectItem value="User">User</SelectItem>
+                                            <SelectItem value="Admin">Quản lý</SelectItem>
+                                            <SelectItem value="User">Nhân viên</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <Select value={statusFilter} onValueChange={setStatusFilter}>

@@ -11,14 +11,12 @@ import { ShipmentStatus, IShipment } from "@/types"
 
 const getStatusBadge = (status: ShipmentStatus) => {
     switch (status) {
-        case ShipmentStatus.PENDING:
-            return <Badge className="bg-yellow-600">Đang chờ xử lý</Badge>
         case ShipmentStatus.IN_PROGRESS:
-            return <Badge className="bg-yellow-600">Đang xử lý</Badge>
+            return <Badge className="bg-yellow-600">Đang quét</Badge>
         case ShipmentStatus.COMPLETED:
-            return <Badge className="bg-green-600">Hoàn thành</Badge>
+            return <Badge className="bg-green-600">Đã tạo lô hàng</Badge>
         case ShipmentStatus.CANCELLED:
-            return <Badge className="bg-red-600">Đã hủy</Badge>
+            return <Badge className="bg-red-600">Hủy</Badge>
         default:
             return <Badge variant="secondary">{status}</Badge>
     }
@@ -41,6 +39,20 @@ export const ShipmentsAdminCard = () => {
         }
     }
 
+    const getStatusText = (status?: ShipmentStatus) => {
+        if (!status) return "Không xác định";
+        switch (status) {
+            case ShipmentStatus.IN_PROGRESS:
+                return "Đang quét"
+            case ShipmentStatus.COMPLETED:
+                return "Đã tạo lô hàng"
+            case ShipmentStatus.CANCELLED:
+                return "Hủy"
+            default:
+                return "Không xác định"
+        }
+    }
+
     const handleExport = () => {
         if (shipments.length === 0) {
             toast.error("Không có dữ liệu để xuất")
@@ -53,7 +65,7 @@ export const ShipmentsAdminCard = () => {
                 const data = shipments.map((shipment, index) => ({
                     STT: index + 1,
                     "Mã lô hàng": shipment.id,
-                    "Trạng thái": shipment.status,
+                    "Trạng thái": getStatusText(shipment.status),
                     "Số lượng sản phẩm": shipment.items?.length || 0,
                     "Ngày tạo": shipment.createdAt
                         ? moment(shipment.createdAt).format("DD/MM/YYYY HH:mm:ss")
@@ -64,8 +76,8 @@ export const ShipmentsAdminCard = () => {
                 const columnWidths = [
                     { wch: 5 },  // STT
                     { wch: 25 }, // Mã lô hàng
-                    { wch: 15 }, // Trạng thái
-                    { wch: 15 }, // Số lượng sản phẩm
+                    { wch: 20 }, // Trạng thái
+                    { wch: 18 }, // Số lượng sản phẩm
                     { wch: 20 }, // Ngày tạo
                 ]
                 worksheet["!cols"] = columnWidths
@@ -116,9 +128,7 @@ export const ShipmentsAdminCard = () => {
 
     const totalItems = shipments.reduce((sum, s) => sum + (s.items?.length || 0), 0)
     const completedShipments = shipments.filter(s => s.status === ShipmentStatus.COMPLETED).length
-    const pendingShipments = shipments.filter(s => s.status === ShipmentStatus.PENDING).length
     const inProgressShipments = shipments.filter(s => s.status === ShipmentStatus.IN_PROGRESS).length
-    const activeShipments = pendingShipments + inProgressShipments // Tổng đang chờ + đang xử lý
 
     return (
         <div className="space-y-6">
@@ -137,25 +147,23 @@ export const ShipmentsAdminCard = () => {
 
                 <Card className="rounded-lg shadow-sm">
                     <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Đang hoạt động</CardTitle>
+                        <CardTitle className="text-sm font-medium">Đang quét</CardTitle>
                         <Package className="w-4 h-4 text-yellow-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-yellow-600">{activeShipments}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Chờ xử lý: {pendingShipments} | Đang xử lý: {inProgressShipments}
-                        </p>
+                        <div className="text-2xl font-bold text-yellow-600">{inProgressShipments}</div>
+                        <p className="text-xs text-muted-foreground">Lô hàng đang quét</p>
                     </CardContent>
                 </Card>
 
                 <Card className="rounded-lg shadow-sm">
                     <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Hoàn thành</CardTitle>
+                        <CardTitle className="text-sm font-medium">Đã tạo lô hàng</CardTitle>
                         <PackageCheck className="w-4 h-4 text-green-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">{completedShipments}</div>
-                        <p className="text-xs text-muted-foreground">Lô hàng đã hoàn thành</p>
+                        <p className="text-xs text-muted-foreground">Lô hàng đã tạo</p>
                     </CardContent>
                 </Card>
 
@@ -211,10 +219,9 @@ export const ShipmentsAdminCard = () => {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                                <SelectItem value={ShipmentStatus.PENDING}>Đang chờ xử lý</SelectItem>
-                                <SelectItem value={ShipmentStatus.IN_PROGRESS}>Đang xử lý</SelectItem>
-                                <SelectItem value={ShipmentStatus.COMPLETED}>Hoàn thành</SelectItem>
-                                <SelectItem value={ShipmentStatus.CANCELLED}>Đã hủy</SelectItem>
+                                <SelectItem value={ShipmentStatus.IN_PROGRESS}>Đang quét</SelectItem>
+                                <SelectItem value={ShipmentStatus.COMPLETED}>Đã tạo lô hàng</SelectItem>
+                                <SelectItem value={ShipmentStatus.CANCELLED}>Hủy</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select value={dateFilter} onValueChange={setDateFilter}>
@@ -276,7 +283,7 @@ export const ShipmentsAdminCard = () => {
                                                         <span className="font-medium">{shipment.id}</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{getStatusBadge(shipment.status || ShipmentStatus.PENDING)}</TableCell>
+                                                <TableCell>{getStatusBadge(shipment.status || ShipmentStatus.IN_PROGRESS)}</TableCell>
                                                 <TableCell className="hidden md:table-cell">
                                                     <Badge variant="outline">
                                                         {shipment.items?.length || 0} sản phẩm

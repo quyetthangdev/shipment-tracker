@@ -26,7 +26,7 @@ export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSucc
     const handleSubmit = (shipment?: IShipment) => {
         // Here you can handle the shipment creation logic
         toast.success(`Lô hàng ${shipment?.id} đã được tạo thành công!`)
-        updateShipmentStatus(shipment?.id || '', ShipmentStatus.IN_PROGRESS);
+        updateShipmentStatus(shipment?.id || '', ShipmentStatus.COMPLETED);
 
         // Clear code parameter from URL
         navigate('/dashboard', { replace: true })
@@ -37,7 +37,7 @@ export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSucc
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger className="flex items-center justify-center w-full" asChild>
+            <DialogTrigger className="flex justify-center items-center w-full" asChild>
                 <Button
                     disabled={disabled}
                     className="w-full text-sm bg-green-600 sm:w-fit hover:bg-green-700"
@@ -59,7 +59,7 @@ export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSucc
                         <Input id="name-1" value={shipment?.id} />
                     </div>
                 </div>
-                <DialogFooter className="grid justify-between grid-cols-2 gap-2">
+                <DialogFooter className="grid grid-cols-2 gap-2 justify-between">
                     <DialogClose asChild>
                         <Button variant="outline">Hủy</Button>
                     </DialogClose>

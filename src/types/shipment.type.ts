@@ -1,39 +1,38 @@
-import { IBase } from "./base.type"
+import { IBase } from "./base.type";
 
 export enum ShipmentStatus {
-    PENDING = "pending",
-    IN_PROGRESS = "in_progress",
-    COMPLETED = "completed",
-    CANCELLED = "cancelled"
+  IN_PROGRESS = "in_progress", // ĐANG QUÉT
+  COMPLETED = "completed", // ĐÃ TẠO LÔ HÀNG
+  CANCELLED = "cancelled", // HỦY
 }
 
 export interface IShipment extends IBase {
-    id?: string // barcode or unique identifier
-    name?: string
-    trackingNumber?: string
-    items: IShipmentItem[]
-    status?: ShipmentStatus
-    origin?: string
-    destination?: string
-    creator?: string
+  id?: string; // barcode or unique identifier
+  name?: string;
+  trackingNumber?: string;
+  items: IShipmentItem[];
+  status?: ShipmentStatus;
+  origin?: string;
+  destination?: string;
+  creator?: string;
 }
-    
+
 export interface IShipmentItem {
-    id: string // unique identifier for the item - QR code
-    createdAt: string // ISO date string
-    creator: string // user who created the item
+  id: string; // unique identifier for the item - QR code
+  createdAt: string; // ISO date string
+  creator: string; // user who created the item
 }
 
 export interface IShipmentToExport {
-    logoString: string
-    id: string
-    slug: string
-    name?: string
-    trackingNumber?: string
-    items: IShipmentItem[]
-    status?: ShipmentStatus
-    origin?: string
-    destination?: string
-    creator?: string
-    createdAt: string // ISO date string
+  logoString: string;
+  id: string;
+  slug: string;
+  name?: string;
+  trackingNumber?: string;
+  items: IShipmentItem[];
+  status?: ShipmentStatus;
+  origin?: string;
+  destination?: string;
+  creator?: string;
+  createdAt: string; // ISO date string
 }

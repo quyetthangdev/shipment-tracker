@@ -139,7 +139,7 @@ const getActionBadge = (action: AuditAction) => {
 
 const getUserDisplayName = (username: string) => {
     const userMap: Record<string, string> = {
-        "admin": "Quản trị viên",
+        "admin": "Quản lý",
         "user": "Người dùng",
         "system": "Hệ thống",
     }
@@ -245,7 +245,7 @@ export const AuditLogsCard = () => {
                     <div className="relative">
                         <Search className="absolute top-3 left-3 w-4 h-4 text-gray-400" />
                         <Input
-                            placeholder="Tìm kiếm..."
+                            placeholder="Tìm kiếm theo hành động..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-9"

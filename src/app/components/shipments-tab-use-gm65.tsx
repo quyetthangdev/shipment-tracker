@@ -97,7 +97,7 @@ export default function ShipmentsTab() {
                                             {existingShipment.id}
                                         </CardTitle>
                                         <Badge className="flex-shrink-0 text-xs bg-muted-foreground sm:text-sm">
-                                            Đang chờ xử lý
+                                            Đang quét
                                         </Badge>
                                     </div>
                                     <div className="grid grid-cols-1 gap-2 mt-3 text-xs text-gray-700 sm:gap-3 sm:mt-4 sm:text-sm md:grid-cols-3">

@@ -1,7 +1,7 @@
 import moment from "moment"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Search } from "lucide-react"
 import autoTable from "jspdf-autotable"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import jsPDF from 'jspdf'
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
@@ -14,6 +14,7 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
+    Input,
     Table,
     TableBody,
     TableCell,
@@ -30,18 +31,17 @@ import { Be_Vietnam_Pro_base64 } from "@/assets/font/base64"
 export default function ShipmentDetailTab() {
     const { shipments } = useShipmentStore()
     const printRef = useRef<HTMLDivElement>(null);
+    const [searchQuery, setSearchQuery] = useState("")
 
     const getStatusText = (status?: string) => {
         if (!status) return "Không xác định";
         switch (status) {
-            case ShipmentStatus.PENDING:
-                return "Chờ xử lý"
             case ShipmentStatus.IN_PROGRESS:
-                return "Đang xử lý"
+                return "Đang quét"
             case ShipmentStatus.COMPLETED:
-                return "Hoàn tất"
+                return "Đã tạo lô hàng"
             case ShipmentStatus.CANCELLED:
-                return "Đã hủy"
+                return "Hủy"
             default:
                 return "Không xác định"
         }
@@ -120,6 +120,11 @@ export default function ShipmentDetailTab() {
         // Tải về file
         doc.save(`phieu-dong-goi-${shipment.id}.pdf`)
     }
+
+    // Filter shipments dựa trên search query
+    const filteredShipments = shipments.filter(shipment =>
+        shipment.id?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
 
     const handleExportExcel = async (shipment: IShipment) => {
         try {
@@ -238,78 +243,110 @@ export default function ShipmentDetailTab() {
             <div className="flex flex-col gap-4 justify-between items-start sm:flex-row sm:items-center">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">Thông tin chi tiết lô hàng</h2>
-                    <p className="mt-1 text-sm text-gray-600">Tổng cộng {shipments.length} lô hàng</p>
+                    <p className="mt-1 text-sm text-gray-600">
+                        {searchQuery ? `Tìm thấy ${filteredShipments.length} / ${shipments.length} lô hàng` : `Tổng cộng ${shipments.length} lô hàng`}
+                    </p>
+                </div>
+                <div className="relative w-full sm:w-80">
+                    <Search className="absolute left-3 top-1/2 w-4 h-4 text-gray-400 -translate-y-1/2" />
+                    <Input
+                        type="text"
+                        placeholder="Tìm kiếm theo mã lô hàng..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                    />
                 </div>
             </div>
 
-            {shipments.map((createdShipment, index) => (
-                <Card key={createdShipment.id || index} className="rounded-lg shadow-sm">
-                    <CardHeader className="bg-gray-50 border-b">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="flex-1">
-                                <div className="flex gap-3 items-center">
-                                    <CardTitle className="text-xl">{createdShipment.id}</CardTitle>
-                                    <Badge
-                                        variant={createdShipment.status === ShipmentStatus.COMPLETED ? "default" : "secondary"}
-                                        className={createdShipment.status === ShipmentStatus.COMPLETED ? "bg-green-600" : "bg-yellow-500 text-white"}
-                                    >
-                                        {createdShipment.status === ShipmentStatus.COMPLETED ? "Hoàn thành" : "Đang xử lý"}
-                                    </Badge>
-                                </div>
-                                <div className="flex flex-col gap-2 mt-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:gap-4">
-                                    <span>👤 Người tạo: <strong>{createdShipment.creator}</strong></span>
-                                    <span>🕒 {moment(createdShipment.createdAt).format("HH:mm:ss DD/MM/YYYY")}</span>
-                                    <span>📦 <strong>{createdShipment.items?.length || 0}</strong> sản phẩm</span>
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button size="sm" onClick={() => handleExportPDF(createdShipment)}>
-                                    Xuất PDF
-                                </Button>
-                                <Button size="sm" variant="outline" onClick={() => handleExportExcel(createdShipment)}>
-                                    Xuất Excel
-                                </Button>
-                            </div>
-                        </div>
-                    </CardHeader>
-
-                    <CardContent className="pt-4">
-                        <CardDescription className="mb-3">
-                            Lịch sử quét QR - Tất cả mã QR đã quét cho lô hàng này
-                        </CardDescription>
-                        <div className="overflow-x-auto rounded-lg border shadow-sm">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="w-16">STT</TableHead>
-                                        <TableHead>Mã QR</TableHead>
-                                        <TableHead>Thời gian quét</TableHead>
-                                        <TableHead>Người quét</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {createdShipment?.items && createdShipment.items.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4} className="py-8 text-center text-gray-500">
-                                                Chưa có mã QR nào được quét
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        createdShipment?.items && createdShipment.items.map((item, itemIndex) => (
-                                            <TableRow key={item.id}>
-                                                <TableCell className="font-medium">{itemIndex + 1}</TableCell>
-                                                <TableCell className="font-mono text-sm">{item.id}</TableCell>
-                                                <TableCell>{moment(item.createdAt).format("HH:mm:ss DD/MM/YYYY")}</TableCell>
-                                                <TableCell className="text-sm">{item.creator}</TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
+            {filteredShipments.length === 0 ? (
+                <Card className="rounded-lg shadow-sm">
+                    <CardContent className="flex flex-col justify-center items-center py-12">
+                        <Search className="mb-4 w-12 h-12 text-gray-400" />
+                        <h3 className="mb-2 text-lg font-medium text-gray-900">Không tìm thấy lô hàng nào!</h3>
+                        <p className="text-sm text-gray-500">Thử tìm kiếm với từ khóa khác</p>
                     </CardContent>
                 </Card>
-            ))}
+            ) : (
+                filteredShipments.map((createdShipment, index) => (
+                    <Card key={createdShipment.id || index} className="rounded-lg shadow-sm">
+                        <CardHeader className="bg-gray-50 border-b">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex-1">
+                                    <div className="flex gap-3 items-center">
+                                        <CardTitle className="text-xl">{createdShipment.id}</CardTitle>
+                                        <Badge
+                                            variant="default"
+                                            className={
+                                                createdShipment.status === ShipmentStatus.COMPLETED
+                                                    ? "bg-green-600"
+                                                    : createdShipment.status === ShipmentStatus.CANCELLED
+                                                        ? "bg-red-600"
+                                                        : "bg-yellow-500 text-white"
+                                            }
+                                        >
+                                            {createdShipment.status === ShipmentStatus.COMPLETED && "Đã tạo lô hàng"}
+                                            {createdShipment.status === ShipmentStatus.IN_PROGRESS && "Đang quét"}
+                                            {createdShipment.status === ShipmentStatus.CANCELLED && "Hủy"}
+                                        </Badge>
+                                    </div>
+                                    <div className="flex flex-col gap-2 mt-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:gap-4">
+                                        <span>👤 Người tạo: <strong>{createdShipment.creator}</strong></span>
+                                        <span>🕒 {moment(createdShipment.createdAt).format("HH:mm:ss DD/MM/YYYY")}</span>
+                                        <span>📦 <strong>{createdShipment.items?.length || 0}</strong> sản phẩm</span>
+                                    </div>
+                                </div>
+                                {createdShipment.status === ShipmentStatus.COMPLETED && (
+                                    <div className="flex gap-2">
+                                        <Button size="sm" onClick={() => handleExportPDF(createdShipment)}>
+                                            Xuất PDF
+                                        </Button>
+                                        <Button size="sm" variant="outline" onClick={() => handleExportExcel(createdShipment)}>
+                                            Xuất Excel
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </CardHeader>
+
+                        <CardContent className="pt-4">
+                            <CardDescription className="mb-3">
+                                Lịch sử quét QR - Tất cả mã QR đã quét cho lô hàng này
+                            </CardDescription>
+                            <div className="overflow-x-auto rounded-lg border shadow-sm">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-16">STT</TableHead>
+                                            <TableHead>Mã QR</TableHead>
+                                            <TableHead>Thời gian quét</TableHead>
+                                            <TableHead>Người quét</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {createdShipment?.items && createdShipment.items.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="py-8 text-center text-gray-500">
+                                                    Chưa có mã QR nào được quét
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            createdShipment?.items && createdShipment.items.map((item, itemIndex) => (
+                                                <TableRow key={item.id}>
+                                                    <TableCell className="font-medium">{itemIndex + 1}</TableCell>
+                                                    <TableCell className="font-mono text-sm">{item.id}</TableCell>
+                                                    <TableCell>{moment(item.createdAt).format("HH:mm:ss DD/MM/YYYY")}</TableCell>
+                                                    <TableCell className="text-sm">{item.creator}</TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))
+            )}
 
             <div ref={printRef} style={{ display: 'none' }} />
         </div>

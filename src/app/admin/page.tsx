@@ -301,7 +301,7 @@ export default function AdminPage() {
                                     <div className="relative">
                                         <Search className="absolute top-3 left-3 w-4 h-4 text-gray-400" />
                                         <Input
-                                            placeholder="Tìm tên hoặc email..."
+                                            placeholder="Tìm tên hoặc số điện thoại..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             className="pl-9"

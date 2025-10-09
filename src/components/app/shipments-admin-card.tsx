@@ -15,8 +15,6 @@ const getStatusBadge = (status: ShipmentStatus) => {
             return <Badge className="bg-yellow-600">Đang quét</Badge>
         case ShipmentStatus.COMPLETED:
             return <Badge className="bg-green-600">Đã tạo lô hàng</Badge>
-        case ShipmentStatus.CANCELLED:
-            return <Badge className="bg-red-600">Hủy</Badge>
         default:
             return <Badge variant="secondary">{status}</Badge>
     }
@@ -46,8 +44,6 @@ export const ShipmentsAdminCard = () => {
                 return "Đang quét"
             case ShipmentStatus.COMPLETED:
                 return "Đã tạo lô hàng"
-            case ShipmentStatus.CANCELLED:
-                return "Hủy"
             default:
                 return "Không xác định"
         }
@@ -221,7 +217,6 @@ export const ShipmentsAdminCard = () => {
                                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
                                 <SelectItem value={ShipmentStatus.IN_PROGRESS}>Đang quét</SelectItem>
                                 <SelectItem value={ShipmentStatus.COMPLETED}>Đã tạo lô hàng</SelectItem>
-                                <SelectItem value={ShipmentStatus.CANCELLED}>Hủy</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select value={dateFilter} onValueChange={setDateFilter}>

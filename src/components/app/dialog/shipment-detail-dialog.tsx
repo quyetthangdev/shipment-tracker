@@ -23,8 +23,6 @@ const getStatusBadge = (status: ShipmentStatus) => {
             return <Badge className="bg-yellow-600">Đang quét</Badge>
         case ShipmentStatus.COMPLETED:
             return <Badge className="bg-green-600">Đã tạo lô hàng</Badge>
-        case ShipmentStatus.CANCELLED:
-            return <Badge className="bg-red-600">Hủy</Badge>
         default:
             return <Badge variant="secondary">{status}</Badge>
     }
@@ -37,8 +35,6 @@ const getStatusText = (status?: string) => {
             return "Đang quét"
         case ShipmentStatus.COMPLETED:
             return "Đã tạo lô hàng"
-        case ShipmentStatus.CANCELLED:
-            return "Hủy"
         default:
             return "Không xác định"
     }

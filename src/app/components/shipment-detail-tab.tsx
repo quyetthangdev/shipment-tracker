@@ -40,8 +40,6 @@ export default function ShipmentDetailTab() {
                 return "Đang quét"
             case ShipmentStatus.COMPLETED:
                 return "Đã tạo lô hàng"
-            case ShipmentStatus.CANCELLED:
-                return "Hủy"
             default:
                 return "Không xác định"
         }
@@ -287,7 +285,6 @@ export default function ShipmentDetailTab() {
                                         >
                                             {createdShipment.status === ShipmentStatus.COMPLETED && "Đã tạo lô hàng"}
                                             {createdShipment.status === ShipmentStatus.IN_PROGRESS && "Đang quét"}
-                                            {createdShipment.status === ShipmentStatus.CANCELLED && "Hủy"}
                                         </Badge>
                                     </div>
                                     <div className="flex flex-col gap-2 mt-2 text-sm text-gray-600 sm:flex-row sm:items-center sm:gap-4">

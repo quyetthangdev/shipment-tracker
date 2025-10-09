@@ -151,9 +151,13 @@ export default function ShipmentDetailTab() {
             worksheet.mergeCells(`A${infoRow1.number}:D${infoRow1.number}`);
             infoRow1.getCell(1).font = { bold: true };
 
-            const infoRow2 = worksheet.addRow([`Ngày xuất: ${exportTime}`]);
+            const infoRow2 = worksheet.addRow([`Người tạo: ${shipment.creator || 'Chưa rõ'}`]);
             worksheet.mergeCells(`A${infoRow2.number}:D${infoRow2.number}`);
             infoRow2.getCell(1).font = { bold: true };
+
+            const infoRow3 = worksheet.addRow([`Ngày xuất: ${exportTime}`]);
+            worksheet.mergeCells(`A${infoRow3.number}:D${infoRow3.number}`);
+            infoRow3.getCell(1).font = { bold: true };
 
             // === Empty row
             worksheet.addRow([]);

@@ -61,6 +61,7 @@ export const ShipmentsAdminCard = () => {
                 const data = shipments.map((shipment, index) => ({
                     STT: index + 1,
                     "Mã lô hàng": shipment.id,
+                    "Người tạo": shipment.creator || "—",
                     "Trạng thái": getStatusText(shipment.status),
                     "Số lượng sản phẩm": shipment.items?.length || 0,
                     "Ngày tạo": shipment.createdAt
@@ -72,6 +73,7 @@ export const ShipmentsAdminCard = () => {
                 const columnWidths = [
                     { wch: 5 },  // STT
                     { wch: 25 }, // Mã lô hàng
+                    { wch: 20 }, // Người tạo
                     { wch: 20 }, // Trạng thái
                     { wch: 18 }, // Số lượng sản phẩm
                     { wch: 20 }, // Ngày tạo
@@ -248,6 +250,7 @@ export const ShipmentsAdminCard = () => {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Mã lô hàng</TableHead>
+                                    <TableHead className="hidden sm:table-cell">Người tạo</TableHead>
                                     <TableHead>Trạng thái</TableHead>
                                     <TableHead className="hidden md:table-cell">Số sản phẩm</TableHead>
                                     <TableHead className="hidden lg:table-cell">Ngày tạo</TableHead>
@@ -257,7 +260,7 @@ export const ShipmentsAdminCard = () => {
                             <TableBody>
                                 {filteredShipments.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="h-32 text-center text-gray-500">
+                                        <TableCell colSpan={6} className="h-32 text-center text-gray-500">
                                             {shipments.length === 0
                                                 ? "Chưa có lô hàng nào"
                                                 : "Không tìm thấy lô hàng phù hợp"}
@@ -277,6 +280,9 @@ export const ShipmentsAdminCard = () => {
                                                         <Package className="w-4 h-4 text-blue-600" />
                                                         <span className="font-medium">{shipment.id}</span>
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell">
+                                                    <span className="text-sm">{shipment.creator || "—"}</span>
                                                 </TableCell>
                                                 <TableCell>{getStatusBadge(shipment.status || ShipmentStatus.IN_PROGRESS)}</TableCell>
                                                 <TableCell className="hidden md:table-cell">

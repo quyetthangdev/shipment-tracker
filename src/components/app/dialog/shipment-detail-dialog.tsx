@@ -144,9 +144,13 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
             worksheet.mergeCells(`A${infoRow1.number}:D${infoRow1.number}`)
             infoRow1.getCell(1).font = { bold: true }
 
-            const infoRow2 = worksheet.addRow([`Ngày xuất: ${exportTime}`])
+            const infoRow2 = worksheet.addRow([`Người tạo: ${shipment.creator || 'Chưa rõ'}`])
             worksheet.mergeCells(`A${infoRow2.number}:D${infoRow2.number}`)
             infoRow2.getCell(1).font = { bold: true }
+
+            const infoRow3 = worksheet.addRow([`Ngày xuất: ${exportTime}`])
+            worksheet.mergeCells(`A${infoRow3.number}:D${infoRow3.number}`)
+            infoRow3.getCell(1).font = { bold: true }
 
             worksheet.addRow([])
 
@@ -255,6 +259,10 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
                             <div>{getStatusBadge(shipment.status || ShipmentStatus.IN_PROGRESS)}</div>
                         </div>
                         <div className="space-y-1">
+                            <p className="text-sm text-gray-500">Người tạo</p>
+                            <p className="font-medium">{shipment.creator || "—"}</p>
+                        </div>
+                        <div className="space-y-1">
                             <p className="text-sm text-gray-500">
                                 <Calendar className="inline mr-1 w-4 h-4" />
                                 Ngày tạo
@@ -265,7 +273,7 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
                                     : "—"}
                             </p>
                         </div>
-                        <div className="space-y-1">
+                        <div className="col-span-2 space-y-1">
                             <p className="text-sm text-gray-500">
                                 <ListChecks className="inline mr-1 w-4 h-4" />
                                 Số lượng sản phẩm

@@ -10,18 +10,20 @@ import { Edit } from "lucide-react"
 interface UpdateEmployeeDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    employee: { id: string; name: string; phone: string } | null
+    employee: { id: string; name: string; phone: string; password?: string } | null
 }
 
 export const UpdateEmployeeDialog = ({ open, onOpenChange, employee }: UpdateEmployeeDialogProps) => {
     const [name, setName] = useState("")
     const [phone, setPhone] = useState("")
+    const [password, setPassword] = useState("")
     const { updateEmployee } = useEmployeeStore()
 
     useEffect(() => {
         if (employee) {
             setName(employee.name)
             setPhone(employee.phone)
+            setPassword(employee.password || "")
         }
     }, [employee])
 
@@ -47,10 +49,23 @@ export const UpdateEmployeeDialog = ({ open, onOpenChange, employee }: UpdateEmp
             return
         }
 
-        updateEmployee(employee.id, {
+        // Validate password if provided
+        if (password.trim() && password.length < 6) {
+            toast.error("Mật khẩu phải có ít nhất 6 ký tự")
+            return
+        }
+
+        const updateData: { name: string; phone: string; password?: string } = {
             name: name.trim(),
             phone: phone.trim(),
-        })
+        }
+
+        // Only include password if it's been changed/provided
+        if (password.trim()) {
+            updateData.password = password.trim()
+        }
+
+        updateEmployee(employee.id, updateData)
 
         toast.success(`Đã cập nhật thông tin ${name}`)
         onOpenChange(false)
@@ -104,6 +119,19 @@ export const UpdateEmployeeDialog = ({ open, onOpenChange, employee }: UpdateEmp
                                 onChange={(e) => setPhone(e.target.value)}
                                 className="col-span-3"
                                 placeholder="0912345678"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 items-center">
+                            <Label htmlFor="update-password" className="text-right">
+                                Mật khẩu
+                            </Label>
+                            <Input
+                                id="update-password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="col-span-3"
+                                placeholder="Để trống nếu không đổi"
                             />
                         </div>
                     </div>

@@ -2,6 +2,7 @@ export interface IEmployee {
   id: string;
   name: string;
   phone: string;
+  password?: string;
   createdAt: string;
 }
 

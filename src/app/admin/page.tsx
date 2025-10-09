@@ -18,6 +18,7 @@ const mockUsers = [
         name: "Nguyễn Văn Admin",
         email: "admin@company.com",
         phone: "0901234567",
+        password: "admin123",
         role: "Admin",
         status: "Active",
         lastLogin: "2024-01-16 09:00:00",
@@ -29,6 +30,7 @@ const mockUsers = [
         name: "Trần Thị User",
         email: "user@company.com",
         phone: "0912345678",
+        password: "user123",
         role: "User",
         status: "Active",
         lastLogin: "2024-01-16 11:45:12",
@@ -40,6 +42,7 @@ const mockUsers = [
         name: "Lê Văn Minh",
         email: "minh.le@company.com",
         phone: "0923456789",
+        password: "minh123",
         role: "User",
         status: "Active",
         lastLogin: "2024-01-15 16:20:00",
@@ -51,6 +54,7 @@ const mockUsers = [
         name: "Phạm Thị Lan",
         email: "lan.pham@company.com",
         phone: "0934567890",
+        password: "lan123",
         role: "User",
         status: "Inactive",
         lastLogin: "2024-01-10 13:45:00",
@@ -62,6 +66,7 @@ const mockUsers = [
         name: "Hoàng Văn Hùng",
         email: "hung.hoang@company.com",
         phone: "0945678901",
+        password: "hung123",
         role: "Admin",
         status: "Active",
         lastLogin: "2024-01-16 08:30:00",
@@ -78,7 +83,7 @@ export default function AdminPage() {
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false)
-    const [selectedEmployee, setSelectedEmployee] = useState<{ id: string; name: string; phone: string } | null>(null)
+    const [selectedEmployee, setSelectedEmployee] = useState<{ id: string; name: string; phone: string; password?: string } | null>(null)
 
     // User filters
     const [searchTerm, setSearchTerm] = useState("")
@@ -95,8 +100,8 @@ export default function AdminPage() {
         setIsDeleteDialogOpen(true)
     }
 
-    const handleUpdateUser = (userId: string, userName: string, userPhone: string) => {
-        setSelectedEmployee({ id: userId, name: userName, phone: userPhone })
+    const handleUpdateUser = (userId: string, userName: string, userPhone: string, userPassword?: string) => {
+        setSelectedEmployee({ id: userId, name: userName, phone: userPhone, password: userPassword })
         setIsUpdateDialogOpen(true)
     }
 
@@ -108,6 +113,7 @@ export default function AdminPage() {
             name: emp.name,
             email: emp.phone, // Sử dụng phone như email để hiển thị
             phone: emp.phone,
+            password: emp.password,
             role: "User",
             status: "Active",
             lastLogin: moment(emp.createdAt).format("YYYY-MM-DD HH:mm:ss"),
@@ -394,7 +400,7 @@ export default function AdminPage() {
                                                                 <Button
                                                                     variant="outline"
                                                                     size="sm"
-                                                                    onClick={() => handleUpdateUser(user.id, user.name, user.phone || "")}
+                                                                    onClick={() => handleUpdateUser(user.id, user.name, user.phone || "", user.password)}
                                                                     className="text-muted-foreground"
                                                                 >
                                                                     <Edit className="w-3 h-3" />

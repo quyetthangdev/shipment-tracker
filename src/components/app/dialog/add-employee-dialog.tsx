@@ -14,6 +14,7 @@ interface AddEmployeeDialogProps {
 export const AddEmployeeDialog = ({ open, onOpenChange }: AddEmployeeDialogProps) => {
     const [name, setName] = useState("")
     const [phone, setPhone] = useState("")
+    const [password, setPassword] = useState("")
     const { addEmployee } = useEmployeeStore()
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -36,10 +37,21 @@ export const AddEmployeeDialog = ({ open, onOpenChange }: AddEmployeeDialogProps
             return
         }
 
+        if (!password.trim()) {
+            toast.error("Vui lòng nhập mật khẩu")
+            return
+        }
+
+        if (password.length < 6) {
+            toast.error("Mật khẩu phải có ít nhất 6 ký tự")
+            return
+        }
+
         const newEmployee = {
             id: `emp-${Date.now()}`,
             name: name.trim(),
             phone: phone.trim(),
+            password: password.trim(),
             createdAt: new Date().toISOString(),
         }
 
@@ -49,12 +61,14 @@ export const AddEmployeeDialog = ({ open, onOpenChange }: AddEmployeeDialogProps
         // Reset form
         setName("")
         setPhone("")
+        setPassword("")
         onOpenChange(false)
     }
 
     const handleCancel = () => {
         setName("")
         setPhone("")
+        setPassword("")
         onOpenChange(false)
     }
 
@@ -93,6 +107,19 @@ export const AddEmployeeDialog = ({ open, onOpenChange }: AddEmployeeDialogProps
                                 onChange={(e) => setPhone(e.target.value)}
                                 className="col-span-3"
                                 placeholder="0912345678"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 items-center">
+                            <Label htmlFor="password" className="text-right">
+                                Mật khẩu <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="col-span-3"
+                                placeholder="Tối thiểu 6 ký tự"
                             />
                         </div>
                     </div>

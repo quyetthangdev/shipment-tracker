@@ -16,7 +16,7 @@ export const logAudit = (
     useAuditLogStore.getState().addLog({
       action,
       actionLabel,
-      user: options.user || "system",
+      user: options.user || "Unknown",
       target: options.target,
       ipAddress: options.ipAddress || "Local",
       details: options.details,
@@ -28,8 +28,8 @@ export const getCurrentUser = (): string => {
   // Dynamic import để tránh circular dependency
   try {
     const authModule = require("@/stores/auth.store");
-    return authModule.useAuthStore.getState().user?.username || "system";
+    return authModule.useAuthStore.getState().user?.username || "Unknown";
   } catch {
-    return "system";
+    return "Unknown";
   }
 };

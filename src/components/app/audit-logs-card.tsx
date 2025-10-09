@@ -140,8 +140,7 @@ const getActionBadge = (action: AuditAction) => {
 const getUserDisplayName = (username: string) => {
     const userMap: Record<string, string> = {
         "admin": "Quản lý",
-        "user": "Người dùng",
-        "system": "Hệ thống",
+        "user": "Nhân viên",
     }
 
     return userMap[username.toLowerCase()] || username
@@ -154,10 +153,12 @@ export const AuditLogsCard = () => {
     const [userFilter, setUserFilter] = useState<string>("all")
     const [dateFilter, setDateFilter] = useState<string>("all")
 
-    // Combine mock data with real logs from store
-    const allLogs = [...logs, ...mockAuditLogs].sort((a, b) =>
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )
+    // Combine mock data with real logs from store, filter out system logs
+    const allLogs = [...logs, ...mockAuditLogs]
+        .filter(log => log.user?.toLowerCase() !== 'system')
+        .sort((a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        )
 
     // Get unique users for filter
     const uniqueUsers = Array.from(new Set(allLogs.map(log => log.user)))
@@ -259,9 +260,9 @@ export const AuditLogsCard = () => {
                             <SelectItem value="all">Tất cả hành động</SelectItem>
                             <SelectItem value={AuditAction.LOGIN}>Đăng nhập</SelectItem>
                             <SelectItem value={AuditAction.LOGOUT}>Đăng xuất</SelectItem>
-                            <SelectItem value={AuditAction.CREATE_USER}>Tạo user</SelectItem>
-                            <SelectItem value={AuditAction.UPDATE_USER}>Cập nhật user</SelectItem>
-                            <SelectItem value={AuditAction.DELETE_USER}>Xóa user</SelectItem>
+                            <SelectItem value={AuditAction.CREATE_USER}>Tạo người dùng</SelectItem>
+                            <SelectItem value={AuditAction.UPDATE_USER}>Cập nhật người dùng</SelectItem>
+                            <SelectItem value={AuditAction.DELETE_USER}>Xóa người dùng</SelectItem>
                             <SelectItem value={AuditAction.CREATE_SHIPMENT}>Tạo lô hàng</SelectItem>
                             <SelectItem value={AuditAction.DELETE_SHIPMENT}>Xóa lô hàng</SelectItem>
                         </SelectContent>
@@ -271,7 +272,7 @@ export const AuditLogsCard = () => {
                             <SelectValue placeholder="Người dùng" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">Tất cả người dùng</SelectItem>
+                            <SelectItem value="all">Tất cả vai trò</SelectItem>
                             {uniqueUsers.map((user) => (
                                 <SelectItem key={user} value={user}>
                                     {getUserDisplayName(user)}

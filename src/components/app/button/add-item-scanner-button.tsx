@@ -25,11 +25,11 @@ export default function AddItemScannerButton({ activeShipmentId }: AddItemScanne
             if (event.key === 'Enter' || event.key === 'Tab') {
                 const code = scannerInputRef.current.trim();
                 if (code) {
-                    const existingItems = activeShipment?.items ?? [];
+                    const existingItems = activeShipment?.billings.flatMap(billing => billing.items) ?? [];
                     const isDuplicate = existingItems.some(item => item.id === code);
 
                     if (isDuplicate) {
-                        toast.error(`Mã ${code} đã tồn tại trong lô hàng ${activeShipmentId}`);
+                        toast.error(`Mã ${code} đã tồn tại trong Shipment ${activeShipmentId}`);
                     } else {
                         const newItem: IShipmentItem = {
                             createdAt: new Date().toISOString(),
@@ -37,7 +37,7 @@ export default function AddItemScannerButton({ activeShipmentId }: AddItemScanne
                             creator: "Nguyen Van A", // Thay thế bằng logic thực tế
                         }
                         addShipmentItem(activeShipmentId, newItem);
-                        toast.success(`Đã thêm vật tư ${code} vào lô hàng ${activeShipmentId}`);
+                        toast.success(`Đã thêm vật tư ${code} vào Shipment ${activeShipmentId}`);
                     }
 
                     scannerInputRef.current = '';
@@ -86,7 +86,7 @@ export default function AddItemScannerButton({ activeShipmentId }: AddItemScanne
                     setIsListeningForScanner(true);
                 }
             }}
-            className={`${isListeningForScanner ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"}`}
+            className={`${isListeningForScanner ? "bg-green-600 hover:bg-green-700" : ""}`}
             disabled={activeShipment.status === ShipmentStatus.COMPLETED}
         >
             <Package className="w-4 h-4" />

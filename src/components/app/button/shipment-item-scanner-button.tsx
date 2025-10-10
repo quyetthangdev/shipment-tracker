@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui";
-import { useShipmentStore } from "@/stores";
+import { useShipmentStore, useAuthStore } from "@/stores";
 import { ShipmentStatus } from "@/types";
 
 export default function ShipmentItemScannerButton({ onIsScanning }: { onIsScanning?: (isScanning: boolean) => void }) {
@@ -14,14 +14,18 @@ export default function ShipmentItemScannerButton({ onIsScanning }: { onIsScanni
     const [isListeningForScanner, setIsListeningForScanner] = useState(false);
     const scannerInputRef = useRef<string>('');
     const scannerTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const { shipments, addShipmentItem } = useShipmentStore();
+    const { shipments, addItemToBilling, activeBillingId } = useShipmentStore();
+    const { user } = useAuthStore();
 
     // Tìm shipment hiện tại dựa trên code từ URL
     const activeShipment = code ? shipments.find(s => s.id === code) : null;
+    const activeBilling = activeShipment && activeBillingId
+        ? activeShipment.billings?.find(b => b.id === activeBillingId)
+        : null;
 
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            if (!isListeningForScanner || !activeShipment) return;
+            if (!isListeningForScanner || !activeShipment || !activeBilling) return;
 
             if (event.key === 'Enter' || event.key === 'Tab') {
                 const scannedCode = scannerInputRef.current.trim();
@@ -30,20 +34,23 @@ export default function ShipmentItemScannerButton({ onIsScanning }: { onIsScanni
                 if (scannedCode) {
                     // Kiểm tra xem shipment có đang ở trạng thái có thể chỉnh sửa không
                     if (activeShipment.status === ShipmentStatus.COMPLETED) {
-                        toast.error(`Lô hàng ${activeShipment.id} đã hoàn thành, không thể thêm vật tư`);
+                        toast.error(`Shipment ${activeShipment.id} đã hoàn thành, không thể thêm vật tư`);
+                    } else if (!activeBillingId) {
+                        toast.error(`Vui lòng chọn billing trước khi quét vật tư`);
                     } else {
-                        // Kiểm tra item đã tồn tại trong shipment chưa
-                        const isDuplicate = activeShipment.items?.some(i => i.id === scannedCode);
+                        // Kiểm tra item đã tồn tại trong billing chưa
+                        const isDuplicate = activeBilling.items?.some(i => i.id === scannedCode);
                         if (isDuplicate) {
-                            toast.error(`Vật tư ${scannedCode} đã có trong lô hàng ${activeShipment.id}`);
+                            toast.error(`Vật tư ${scannedCode} đã có trong billing ${activeBillingId}`);
                         } else {
-                            // Thêm item vào shipment hiện tại
-                            addShipmentItem(activeShipment.id!, {
+                            const currentUser = user?.username || "Unknown";
+                            // Thêm item vào billing hiện tại
+                            addItemToBilling(activeShipment.id!, activeBillingId, {
                                 id: scannedCode,
-                                creator: "Nguyen Van A", // Thay bằng user thực tế
+                                creator: currentUser,
                                 createdAt: new Date().toISOString()
                             });
-                            toast.success(`Đã thêm vật tư ${scannedCode} vào lô hàng ${activeShipment.id}`);
+                            toast.success(`Đã thêm vật tư ${scannedCode} vào billing ${activeBillingId}`);
                         }
                     }
 
@@ -71,14 +78,14 @@ export default function ShipmentItemScannerButton({ onIsScanning }: { onIsScanni
             document.removeEventListener('keydown', handleKeyPress);
             if (scannerTimeoutRef.current) clearTimeout(scannerTimeoutRef.current);
         };
-    }, [isListeningForScanner, activeShipment, addShipmentItem]);
+    }, [isListeningForScanner, activeShipment, activeBilling, activeBillingId, addItemToBilling, user?.username]);
 
     return (
         <div className="space-y-3">
-            {!activeShipment ? (
-                <div className="p-3 text-center border rounded-lg bg-gray-50">
+            {!activeShipment || !activeBilling ? (
+                <div className="p-3 text-center bg-gray-50 rounded-lg border">
                     <p className="text-sm text-gray-600">
-                        Cần có shipment trong URL để có thể thêm item
+                        {!activeShipment ? "Cần có shipment để quét vật tư" : "Vui lòng chọn billing trước"}
                     </p>
                 </div>
             ) : (
@@ -103,10 +110,10 @@ export default function ShipmentItemScannerButton({ onIsScanning }: { onIsScanni
                         disabled={activeShipment.status === ShipmentStatus.COMPLETED}
                     >
                         <PlusCircle className="w-4 h-4" />
-                        {isListeningForScanner ? "Dừng quét" : "Quét thêm vật tư"}
+                        {isListeningForScanner ? "Dừng quét" : "Quét vật tư"}
                     </Button>
 
-                    {/* <div className="p-3 border rounded-lg bg-gray-50">
+                    {/* <div className="p-3 bg-gray-50 rounded-lg border">
                         <div className="space-y-1 text-sm text-gray-600">
                             <div>Shipment: <strong>{activeShipment.id}</strong></div>
                             <div>Tên: <strong>{activeShipment.name}</strong></div>
@@ -124,9 +131,9 @@ export default function ShipmentItemScannerButton({ onIsScanning }: { onIsScanni
                         {activeShipment.items && activeShipment.items.length > 0 && (
                             <div className="mt-3">
                                 <div className="mb-2 text-sm font-medium text-gray-700">Items trong shipment:</div>
-                                <div className="space-y-1 overflow-y-auto max-h-32">
+                                <div className="overflow-y-auto space-y-1 max-h-32">
                                     {activeShipment.items.map((item, index) => (
-                                        <div key={item.id} className="px-2 py-1 text-xs bg-white border rounded">
+                                        <div key={item.id} className="px-2 py-1 text-xs bg-white rounded border">
                                             {index + 1}. {item.id}
                                         </div>
                                     ))}

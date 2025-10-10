@@ -14,23 +14,31 @@ import {
 } from '@/components/ui'
 import { useShipmentStore } from '@/stores'
 
-export default function DeleteItemDialog({ item, shipmentId }: { item?: string, shipmentId?: string }) {
+export default function DeleteItemDialog({ item, shipmentId, billingId }: { item?: string, shipmentId?: string, billingId?: string }) {
     const [isOpen, setIsOpen] = useState(false)
-    const { removeShipmentItem } = useShipmentStore()
+    const { removeItemFromBilling, removeShipmentItem } = useShipmentStore()
 
-    const handleDeleteItem = (shipmentId?: string, item?: string) => {
+    const handleDeleteItem = (shipmentId?: string, item?: string, billingId?: string) => {
         if (!shipmentId || !item) {
-            toast.error("Không có lô hàng để xóa vật tư")
+            toast.error("Không có Shipment để xóa vật tư")
             return
         }
-        removeShipmentItem(shipmentId, item)
+
+        // Nếu có billingId thì xóa khỏi billing, không thì dùng legacy method
+        if (billingId) {
+            removeItemFromBilling(shipmentId, billingId, item)
+            toast.success(`Đã xóa vật tư ${item} khỏi billing ${billingId}`)
+        } else {
+            removeShipmentItem(shipmentId, item)
+            toast.success(`Đã xóa vật tư ${item} khỏi đơn hàng ${shipmentId}`)
+        }
+
         setIsOpen(false)
-        toast.success(`Đã xóa vật tư ${item} khỏi đơn hàng ${shipmentId}`)
     }
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger className="flex items-center justify-center w-full" asChild>
+            <DialogTrigger className="flex justify-center items-center w-full" asChild>
                 <Button
                     variant="ghost"
                     className="text-sm w-fit"
@@ -42,9 +50,9 @@ export default function DeleteItemDialog({ item, shipmentId }: { item?: string, 
             <DialogContent className="max-w-[18rem] overflow-hidden rounded-lg transition-all duration-300 hover:overflow-y-auto sm:max-h-[32rem] sm:max-w-[28rem]">
                 <DialogHeader>
                     <DialogTitle>Xóa vật tư</DialogTitle>
-                    <DialogDescription>Xóa vật tư khỏi lô hàng</DialogDescription>
+                    <DialogDescription>Xóa vật tư khỏi Shipment</DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="flex flex-row justify-between gap-2 sm:justify-end">
+                <DialogFooter className="flex flex-row gap-2 justify-between sm:justify-end">
                     <Button
                         variant="outline"
                         className="w-full sm:w-auto"
@@ -55,7 +63,7 @@ export default function DeleteItemDialog({ item, shipmentId }: { item?: string, 
                     <Button
                         variant="destructive"
                         className="w-full sm:w-auto"
-                        onClick={() => handleDeleteItem(shipmentId, item)}
+                        onClick={() => handleDeleteItem(shipmentId, item, billingId)}
                     >
                         Xóa
                     </Button>

@@ -1,8 +1,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge, Button } from "@/components/ui"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { IShipment, ShipmentStatus } from "@/types"
-import { Package, Calendar, ListChecks, Download, FileText } from "lucide-react"
+import { IShipment, ShipmentStatus, BillingStatus } from "@/types"
+import { Package, Calendar, ListChecks, Download, FileText, Receipt } from "lucide-react"
 import moment from "moment"
 import jsPDF from 'jspdf'
 import autoTable from "jspdf-autotable"
@@ -22,7 +22,7 @@ const getStatusBadge = (status: ShipmentStatus) => {
         case ShipmentStatus.IN_PROGRESS:
             return <Badge className="bg-yellow-600">Đang quét</Badge>
         case ShipmentStatus.COMPLETED:
-            return <Badge className="bg-green-600">Đã tạo lô hàng</Badge>
+            return <Badge className="bg-green-600">Đã tạo Shipment</Badge>
         default:
             return <Badge variant="secondary">{status}</Badge>
     }
@@ -34,7 +34,7 @@ const getStatusText = (status?: string) => {
         case ShipmentStatus.IN_PROGRESS:
             return "Đang quét"
         case ShipmentStatus.COMPLETED:
-            return "Đã tạo lô hàng"
+            return "Đã tạo Shipment"
         default:
             return "Không xác định"
     }
@@ -57,16 +57,19 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
         // Tiêu đề chính
         doc.text("PHIẾU ĐÓNG GÓI VẬN CHUYỂN", 105, 15, { align: "center" })
 
-        // Thông tin lô hàng
+        // Thông tin Shipment
         doc.setFontSize(11)
         const createdDate = new Date(shipment.createdAt).toLocaleString("vi-VN")
+        const totalItems = shipment.billings?.reduce((sum, b) => sum + (b.items?.length || 0), 0) || 0
         const info = [
-            [`Mã lô hàng:`, shipment.id],
-            [`Tên lô hàng:`, shipment.name],
+            [`Mã Shipment:`, shipment.id],
+            [`Tên Shipment:`, shipment.name],
             [`Người tạo:`, shipment.creator],
             [`Ngày tạo:`, createdDate],
             [`Trạng thái:`, getStatusText(shipment.status)],
             [`Mã theo dõi:`, shipment.trackingNumber],
+            [`Số billings:`, `${shipment.billings?.length || 0}`],
+            [`Tổng sản phẩm:`, `${totalItems}`],
         ]
 
         let y = 25
@@ -81,36 +84,57 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
         doc.setFont("BeVietnamPro")
         doc.setFontSize(10)
 
-        // Bảng danh sách hàng
-        autoTable(doc, {
-            startY: y,
-            styles: {
-                font: "BeVietnamPro",
-                fontStyle: "normal",
-                fontSize: 10,
-                cellPadding: 3,
-            },
-            headStyles: {
-                fillColor: [22, 160, 133],
-                textColor: 255,
-                halign: "left",
-            },
-            columnStyles: {
-                0: { cellWidth: 20, halign: "center" },
-                1: { cellWidth: 60, halign: "left" },
-                2: { cellWidth: 40, halign: "left" },
-                3: { cellWidth: 50, halign: "left" },
-            },
-            head: [["STT", "Mã sản phẩm", "Người tạo", "Ngày tạo"]],
-            body: shipment.items.map((item, index) => [
-                index + 1,
-                item.id,
-                item.creator,
-                new Date(item.createdAt).toLocaleString("vi-VN"),
-            ]),
-            didDrawCell: (data) => {
-                data.doc.setFont("BeVietnamPro", "normal")
-            },
+        // Duyệt qua từng billing
+        shipment.billings?.forEach((billing, billingIndex) => {
+            // Tiêu đề billing
+            if (y > 250) {
+                doc.addPage()
+                y = 20
+            }
+
+            doc.setFontSize(11)
+            doc.setFont("BeVietnamPro", "bold")
+            doc.text(`Billing ${billingIndex + 1}: ${billing.id}`, 15, y)
+            y += 6
+            doc.setFontSize(9)
+            doc.setFont("BeVietnamPro", "normal")
+            doc.text(`Trạng thái: ${billing.status === BillingStatus.SCANNING ? 'Đang quét' : 'Hoàn thành'} | Số sản phẩm: ${billing.items?.length || 0}`, 15, y)
+            y += 4
+
+            // Bảng danh sách hàng của billing này
+            autoTable(doc, {
+                startY: y,
+                styles: {
+                    font: "BeVietnamPro",
+                    fontStyle: "normal",
+                    fontSize: 9,
+                    cellPadding: 2,
+                },
+                headStyles: {
+                    fillColor: [31, 41, 55],
+                    textColor: 255,
+                    halign: "left",
+                },
+                columnStyles: {
+                    0: { cellWidth: 15, halign: "center" },
+                    1: { cellWidth: 60, halign: "left" },
+                    2: { cellWidth: 40, halign: "left" },
+                    3: { cellWidth: 50, halign: "left" },
+                },
+                head: [["STT", "Mã sản phẩm", "Người tạo", "Ngày tạo"]],
+                body: billing.items?.map((item, index) => [
+                    index + 1,
+                    item.id,
+                    item.creator,
+                    new Date(item.createdAt).toLocaleString("vi-VN"),
+                ]) || [],
+                didDrawCell: (data) => {
+                    data.doc.setFont("BeVietnamPro", "normal")
+                },
+            })
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            y = (doc as any).lastAutoTable.finalY + 10
         })
 
         doc.save(`phieu-dong-goi-${shipment.id}.pdf`)
@@ -123,66 +147,67 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
             const worksheet = workbook.addWorksheet('Phiếu đóng hàng')
 
             const exportTime = moment().format("DD/MM/YYYY HH:mm:ss")
+            const totalItems = shipment.billings?.reduce((sum, b) => sum + (b.items?.length || 0), 0) || 0
 
             // Set column widths
             worksheet.columns = [
                 { width: 6 },
-                { width: 35 },
+                { width: 40 },
                 { width: 25 },
-                { width: 25 },
+                { width: 20 },
+                { width: 20 },
             ]
 
             // Title section
             const titleRow = worksheet.addRow(['PHIẾU QUÉT MÃ ĐÓNG HÀNG'])
-            worksheet.mergeCells(`A${titleRow.number}:D${titleRow.number}`)
+            worksheet.mergeCells(`A${titleRow.number}:E${titleRow.number}`)
             titleRow.getCell(1).font = { bold: true, size: 16 }
             titleRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' }
             titleRow.height = 25
 
             // Info rows
             const infoRow1 = worksheet.addRow([`Mã phiếu: ${shipment.id}`])
-            worksheet.mergeCells(`A${infoRow1.number}:D${infoRow1.number}`)
+            worksheet.mergeCells(`A${infoRow1.number}:E${infoRow1.number}`)
             infoRow1.getCell(1).font = { bold: true }
 
             const infoRow2 = worksheet.addRow([`Người tạo: ${shipment.creator || 'Chưa rõ'}`])
-            worksheet.mergeCells(`A${infoRow2.number}:D${infoRow2.number}`)
+            worksheet.mergeCells(`A${infoRow2.number}:E${infoRow2.number}`)
             infoRow2.getCell(1).font = { bold: true }
 
             const infoRow3 = worksheet.addRow([`Ngày xuất: ${exportTime}`])
-            worksheet.mergeCells(`A${infoRow3.number}:D${infoRow3.number}`)
+            worksheet.mergeCells(`A${infoRow3.number}:E${infoRow3.number}`)
             infoRow3.getCell(1).font = { bold: true }
+
+            const infoRow4 = worksheet.addRow([`Tổng số billings: ${shipment.billings?.length || 0}`])
+            worksheet.mergeCells(`A${infoRow4.number}:E${infoRow4.number}`)
+            infoRow4.getCell(1).font = { bold: true }
 
             worksheet.addRow([])
 
-            // Header row
-            const headerRow = worksheet.addRow(['STT', 'Mã QR sản phẩm', 'Thời gian quét', 'Người quét'])
-            headerRow.eachCell((cell) => {
-                cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
-                cell.fill = {
+            // Duyệt qua từng billing
+            let sttCounter = 0
+            shipment.billings?.forEach((billing, billingIndex) => {
+                // Billing header
+                const billingHeaderRow = worksheet.addRow([`BILLING ${billingIndex + 1}: ${billing.id} (${billing.items?.length || 0} sản phẩm)`])
+                worksheet.mergeCells(`A${billingHeaderRow.number}:E${billingHeaderRow.number}`)
+                billingHeaderRow.getCell(1).font = { bold: true, size: 12 }
+                billingHeaderRow.getCell(1).fill = {
                     type: 'pattern',
                     pattern: 'solid',
-                    fgColor: { argb: 'FF4F81BD' },
+                    fgColor: { argb: 'FFE5E7EB' },
                 }
-                cell.alignment = { vertical: 'middle', horizontal: 'center' }
-                cell.border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
-                }
-            })
+                billingHeaderRow.height = 20
 
-            // Data Rows
-            shipment.items.forEach((item, index) => {
-                const row = worksheet.addRow([
-                    index + 1,
-                    item.id,
-                    moment(item.createdAt).format("DD/MM/YYYY HH:mm:ss"),
-                    item.creator ?? 'Chưa rõ',
-                ])
-
-                row.eachCell((cell) => {
-                    cell.alignment = { vertical: 'middle', horizontal: 'left' }
+                // Header row cho billing
+                const headerRow = worksheet.addRow(['STT', 'Mã QR sản phẩm', 'Thời gian quét', 'Người quét', 'Billing'])
+                headerRow.eachCell((cell) => {
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FF1F2937' },
+                    }
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' }
                     cell.border = {
                         top: { style: 'thin' },
                         left: { style: 'thin' },
@@ -190,22 +215,46 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
                         right: { style: 'thin' },
                     }
                 })
+
+                // Data rows cho billing này
+                billing.items?.forEach((item) => {
+                    sttCounter++
+                    const row = worksheet.addRow([
+                        sttCounter,
+                        item.id,
+                        moment(item.createdAt).format("DD/MM/YYYY HH:mm:ss"),
+                        item.creator ?? 'Chưa rõ',
+                        billing.id,
+                    ])
+
+                    row.eachCell((cell) => {
+                        cell.alignment = { vertical: 'middle', horizontal: 'left' }
+                        cell.border = {
+                            top: { style: 'thin' },
+                            left: { style: 'thin' },
+                            bottom: { style: 'thin' },
+                            right: { style: 'thin' },
+                        }
+                    })
+                })
+
+                // Empty row sau mỗi billing
+                worksheet.addRow([])
             })
 
-            worksheet.addRow([])
-
             // Summary
-            const summaryRow = worksheet.addRow([`Tổng số sản phẩm: ${shipment.items.length}`])
-            worksheet.mergeCells(`A${summaryRow.number}:D${summaryRow.number}`)
-            summaryRow.getCell(1).font = { bold: true }
+            const summaryRow = worksheet.addRow([`TỔNG SỐ SẢN PHẨM: ${totalItems}`])
+            worksheet.mergeCells(`A${summaryRow.number}:E${summaryRow.number}`)
+            summaryRow.getCell(1).font = { bold: true, size: 12 }
+            summaryRow.getCell(1).alignment = { horizontal: 'center' }
 
             // Signature rows
             worksheet.addRow([])
             const signedRow1 = worksheet.addRow(['Người xuất file:', '....................................................'])
-            worksheet.mergeCells(`B${signedRow1.number}:D${signedRow1.number}`)
+            worksheet.mergeCells(`B${signedRow1.number}:E${signedRow1.number}`)
 
             const signedRow2 = worksheet.addRow(['Xác nhận kho:', '....................................................'])
-            worksheet.mergeCells(`B${signedRow2.number}:D${signedRow2.number}`)
+            worksheet.mergeCells(`B${signedRow2.number}:E${signedRow2.number}`)
 
             // Export file
             const buffer = await workbook.xlsx.writeBuffer()
@@ -228,9 +277,9 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
                         <div>
                             <DialogTitle className="flex gap-2 items-center text-xl">
                                 <Package className="w-5 h-5 text-blue-600" />
-                                Chi Tiết Lô Hàng
+                                Chi Tiết Shipment
                             </DialogTitle>
-                            <DialogDescription>Thông tin chi tiết về lô hàng {shipment.id}</DialogDescription>
+                            <DialogDescription>Thông tin chi tiết về Shipment {shipment.id}</DialogDescription>
                         </div>
                         {isCompleted && (
                             <div className="flex gap-2">
@@ -251,7 +300,7 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
                     {/* General Info */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <p className="text-sm text-gray-500">Mã lô hàng</p>
+                            <p className="text-sm text-gray-500">Mã Shipment</p>
                             <p className="font-semibold">{shipment.id}</p>
                         </div>
                         <div className="space-y-1">
@@ -273,55 +322,89 @@ export const ShipmentDetailDialog = ({ open, onOpenChange, shipment }: ShipmentD
                                     : "—"}
                             </p>
                         </div>
-                        <div className="col-span-2 space-y-1">
+                        <div className="space-y-1">
+                            <p className="text-sm text-gray-500">
+                                <Receipt className="inline mr-1 w-4 h-4" />
+                                Số billings
+                            </p>
+                            <p className="text-lg font-semibold">
+                                {shipment.billings?.length || 0}
+                            </p>
+                        </div>
+                        <div className="space-y-1">
                             <p className="text-sm text-gray-500">
                                 <ListChecks className="inline mr-1 w-4 h-4" />
-                                Số lượng sản phẩm
+                                Tổng sản phẩm
                             </p>
-                            <p className="text-lg font-semibold text-blue-600">
-                                {shipment.items?.length || 0} sản phẩm
+                            <p className="text-lg font-semibold">
+                                {shipment.billings?.reduce((sum, b) => sum + (b.items?.length || 0), 0) || 0}
                             </p>
                         </div>
                     </div>
 
-                    {/* Items Table */}
-                    {shipment.items && shipment.items.length > 0 ? (
-                        <div className="rounded-lg border">
-                            <div className="p-4 bg-gray-50 border-b">
-                                <h3 className="font-semibold text-gray-900">Danh sách sản phẩm</h3>
-                                <p className="text-sm text-gray-600">
-                                    Tổng cộng {shipment.items.length} sản phẩm trong lô hàng
-                                </p>
-                            </div>
-                            <div className="max-h-[300px] overflow-y-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-16">STT</TableHead>
-                                            <TableHead>Mã sản phẩm</TableHead>
-                                            <TableHead className="hidden md:table-cell">Ngày thêm</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {shipment.items.map((item, index) => (
-                                            <TableRow key={item.id}>
-                                                <TableCell className="font-medium">{index + 1}</TableCell>
-                                                <TableCell className="font-mono text-sm">{item.id}</TableCell>
-                                                <TableCell className="hidden text-sm text-gray-600 md:table-cell">
-                                                    {item.createdAt
-                                                        ? moment(item.createdAt).format("DD/MM/YYYY HH:mm")
-                                                        : "—"}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                    {/* Billings & Items */}
+                    {(!shipment.billings || shipment.billings.length === 0) ? (
+                        <div className="p-8 text-center bg-gray-50 rounded-lg border">
+                            <Receipt className="mx-auto w-12 h-12 text-gray-400" />
+                            <p className="mt-2 text-sm text-gray-500">Chưa có billing nào</p>
                         </div>
                     ) : (
-                        <div className="p-8 text-center bg-gray-50 rounded-lg border">
-                            <Package className="mx-auto w-12 h-12 text-gray-400" />
-                            <p className="mt-2 text-sm text-gray-500">Lô hàng chưa có sản phẩm nào</p>
+                        <div className="space-y-4">
+                            <h3 className="font-semibold text-gray-900">Danh sách Billings & Sản phẩm</h3>
+                            {shipment.billings.map((billing, billingIndex) => (
+                                <div key={billing.id} className="space-y-2">
+                                    {/* Billing Header */}
+                                    <div className="flex gap-3 justify-between items-center p-3 bg-gray-100 rounded-lg border border-gray-200">
+                                        <div className="flex gap-3 items-center">
+                                            <Receipt className="w-5 h-5" />
+                                            <div>
+                                                <h4 className="font-mono text-sm font-semibold">
+                                                    Billing {billingIndex + 1}: {billing.id}
+                                                </h4>
+                                                <p className="text-xs text-gray-600">
+                                                    {billing.items?.length || 0} sản phẩm •
+                                                    {billing.status === BillingStatus.SCANNING ? ' Đang quét' : ' Hoàn thành'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Badge className={billing.status === BillingStatus.SCANNING ? '' : 'bg-green-600'}>
+                                            {billing.status === BillingStatus.SCANNING ? 'Đang quét' : 'Hoàn thành'}
+                                        </Badge>
+                                    </div>
+
+                                    {/* Items Table */}
+                                    {billing.items && billing.items.length > 0 && (
+                                        <div className="rounded-lg border">
+                                            <div className="max-h-[200px] overflow-y-auto">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow>
+                                                            <TableHead className="w-16">STT</TableHead>
+                                                            <TableHead>Mã sản phẩm</TableHead>
+                                                            <TableHead className="hidden md:table-cell">Thời gian</TableHead>
+                                                            <TableHead className="hidden lg:table-cell">Người quét</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {billing.items.map((item, itemIndex) => (
+                                                            <TableRow key={item.id}>
+                                                                <TableCell className="font-medium">{itemIndex + 1}</TableCell>
+                                                                <TableCell className="font-mono text-sm">{item.id}</TableCell>
+                                                                <TableCell className="hidden text-sm text-gray-600 md:table-cell">
+                                                                    {moment(item.createdAt).format("DD/MM/YYYY HH:mm")}
+                                                                </TableCell>
+                                                                <TableCell className="hidden text-sm lg:table-cell">
+                                                                    {item.creator}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

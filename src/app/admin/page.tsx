@@ -2,13 +2,14 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Avatar, AvatarFallback, Button, Tabs, TabsContent, TabsList, TabsTrigger, Input } from "@/components/ui"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { UserPlus, Edit, Trash2, UsersIcon, User, LogOut, Settings, Shield, Activity, Package, Search, Filter } from "lucide-react"
+import { UserPlus, Edit, Trash2, UsersIcon, User, LogOut, Settings, Shield, Activity, Package, Search, Filter, QrCode } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore, useEmployeeStore } from "@/stores"
 import { ROUTES } from "@/constants"
 import { AddEmployeeDialog, DeleteEmployeeDialog, UpdateEmployeeDialog } from "@/components/app/dialog"
 import { AuditLogsCard } from "@/components/app/audit-logs-card"
 import { ShipmentsAdminCard } from "@/components/app/shipments-admin-card"
+import { QRTracerCard } from "@/components/app/qr-tracer-card"
 import moment from "moment"
 
 // Mock users data
@@ -208,21 +209,26 @@ export default function AdminPage() {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     {/* Sticky Tabs Navigation */}
                     <div className="sticky top-[65px] z-30 pt-4 pb-4 -mx-4 px-4 bg-gray-50">
-                        <TabsList className="grid grid-cols-3 w-full max-w-2xl shadow-sm">
+                        <TabsList className="grid grid-cols-4 w-full max-w-3xl shadow-sm">
                             <TabsTrigger value="users" className="flex gap-2 items-center">
                                 <UsersIcon className="w-4 h-4" />
                                 <span className="hidden sm:inline">Người Dùng</span>
-                                <span className="sm:hidden">Người dùng</span>
+                                <span className="sm:hidden">User</span>
                             </TabsTrigger>
                             <TabsTrigger value="shipments" className="flex gap-2 items-center">
                                 <Package className="w-4 h-4" />
-                                <span className="hidden sm:inline">Lô Hàng</span>
-                                <span className="sm:hidden">Lô hàng</span>
+                                <span className="hidden sm:inline">Shipment</span>
+                                <span className="sm:hidden">Lô</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="qr-tracer" className="flex gap-2 items-center">
+                                <QrCode className="w-4 h-4" />
+                                <span className="hidden sm:inline">Truy Xuất</span>
+                                <span className="sm:hidden">QR</span>
                             </TabsTrigger>
                             <TabsTrigger value="audit-logs" className="flex gap-2 items-center">
                                 <Activity className="w-4 h-4" />
                                 <span className="hidden sm:inline">Nhật Ký</span>
-                                <span className="sm:hidden">Nhật ký</span>
+                                <span className="sm:hidden">Log</span>
                             </TabsTrigger>
                         </TabsList>
                     </div>
@@ -235,10 +241,9 @@ export default function AdminPage() {
                                 <p className="text-gray-600">Quản lý tài khoản người dùng và phân quyền</p>
                             </div>
                             <Button
-                                className="bg-blue-600 hover:bg-blue-700"
                                 onClick={() => setIsAddDialogOpen(true)}
                             >
-                                <UserPlus className="mr-2 w-4 h-4" />
+                                <UserPlus className="w-4 h-4" />
                                 Thêm người dùng
                             </Button>
                         </div>
@@ -429,6 +434,10 @@ export default function AdminPage() {
 
                     <TabsContent value="shipments" className="space-y-6">
                         <ShipmentsAdminCard />
+                    </TabsContent>
+
+                    <TabsContent value="qr-tracer" className="space-y-6">
+                        <QRTracerCard />
                     </TabsContent>
 
                     <TabsContent value="audit-logs" className="space-y-6">

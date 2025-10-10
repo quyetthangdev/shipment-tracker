@@ -22,7 +22,7 @@ export default function ConfirmClearShipmentDialog({ shipmentId, disabled }: { s
     const handleDeleteShipment = (shipmentId: string) => {
         removeShipment(shipmentId)
         setIsOpen(false)
-        toast.success(`Đã xóa lô hàng ${shipmentId}!`)
+        toast.success(`Đã xóa Shipment ${shipmentId}!`)
 
         // Clear code parameter from URL after deleting shipment
         navigate('/dashboard', { replace: true })
@@ -30,22 +30,22 @@ export default function ConfirmClearShipmentDialog({ shipmentId, disabled }: { s
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger className="flex items-center justify-center w-full" asChild>
+            <DialogTrigger className="flex justify-center items-center w-full sm:w-fit" asChild>
                 <Button
                     disabled={disabled}
                     variant="destructive"
-                    className="w-full text-sm"
+                    className="w-full text-sm sm:w-fit"
                     onClick={() => setIsOpen(true)}
                 >
-                    Xóa lô hàng
+                    Xóa Shipment
                 </Button>
             </DialogTrigger>
             <DialogContent className="max-w-[18rem] overflow-hidden rounded-lg transition-all duration-300 hover:overflow-y-auto sm:max-h-[32rem] sm:max-w-[28rem]">
                 <DialogHeader>
-                    <DialogTitle>Xóa lô hàng</DialogTitle>
-                    <DialogDescription>Xóa lô hàng khỏi hệ thống</DialogDescription>
+                    <DialogTitle>Xóa Shipment</DialogTitle>
+                    <DialogDescription>Xóa Shipment khỏi hệ thống</DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="flex flex-row justify-between gap-2 sm:justify-end">
+                <DialogFooter className="flex flex-row gap-2 justify-between sm:justify-end">
                     <Button
                         variant="outline"
                         className="w-full sm:w-auto"

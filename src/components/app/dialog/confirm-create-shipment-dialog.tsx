@@ -25,7 +25,7 @@ export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSucc
 
     const handleSubmit = (shipment?: IShipment) => {
         // Here you can handle the shipment creation logic
-        toast.success(`Lô hàng ${shipment?.id} đã được tạo thành công!`)
+        toast.success(`Shipment ${shipment?.id} đã được tạo thành công!`)
         updateShipmentStatus(shipment?.id || '', ShipmentStatus.COMPLETED);
 
         // Clear code parameter from URL
@@ -37,25 +37,25 @@ export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSucc
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger className="flex justify-center items-center w-full" asChild>
+            <DialogTrigger className="flex justify-center items-center w-full sm:w-fit" asChild>
                 <Button
                     disabled={disabled}
                     className="w-full text-sm bg-green-600 sm:w-fit hover:bg-green-700"
                     onClick={() => setIsOpen(true)}
                 >
-                    Tạo lô hàng
+                    Tạo Shipment
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] max-w-[calc(100vw-32px)] rounded-md">
                 <DialogHeader>
-                    <DialogTitle>Xác nhận thông tin lô hàng</DialogTitle>
+                    <DialogTitle>Xác nhận thông tin Shipment</DialogTitle>
                     <DialogDescription>
-                        Xác nhận thông tin lô hàng để tiếp tục.
+                        Xác nhận thông tin Shipment để tiếp tục.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4">
                     <div className="grid gap-3">
-                        <Label htmlFor="name-1">Mã lô hàng</Label>
+                        <Label htmlFor="name-1">Mã Shipment</Label>
                         <Input id="name-1" value={shipment?.id} />
                     </div>
                 </div>
@@ -63,7 +63,7 @@ export default function ConfirmCreateShipmentDialog({ shipment, disabled, onSucc
                     <DialogClose asChild>
                         <Button variant="outline">Hủy</Button>
                     </DialogClose>
-                    <Button type="submit" variant="destructive" onClick={() => handleSubmit(shipment)}>Tạo lô hàng</Button>
+                    <Button type="submit" variant="destructive" onClick={() => handleSubmit(shipment)}>Tạo Shipment</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

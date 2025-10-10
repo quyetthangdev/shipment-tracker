@@ -15,6 +15,7 @@
     "cap:build:android": "npm run build && npx cap sync android && npx cap copy android"
   },
   "dependencies": {
+    "@capacitor-community/barcode-scanner": "^4.0.1",
     "@capacitor/android": "^6.2.1",
     "@capacitor/cli": "^6.2.1",
     "@capacitor/core": "^6.2.1",

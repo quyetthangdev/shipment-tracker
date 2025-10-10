@@ -14,7 +14,7 @@ const getStatusBadge = (status: ShipmentStatus) => {
         case ShipmentStatus.IN_PROGRESS:
             return <Badge className="bg-yellow-600">Đang quét</Badge>
         case ShipmentStatus.COMPLETED:
-            return <Badge className="bg-green-600">Đã tạo lô hàng</Badge>
+            return <Badge className="bg-green-600">Đã tạo Shipment</Badge>
         default:
             return <Badge variant="secondary">{status}</Badge>
     }
@@ -25,15 +25,16 @@ export const ShipmentsAdminCard = () => {
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState<string>("all")
     const [dateFilter, setDateFilter] = useState<string>("all")
+    const [billingFilter, setBillingFilter] = useState<string>("")
     const [selectedShipment, setSelectedShipment] = useState<IShipment | null>(null)
     const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
 
     const handleDelete = (shipmentId: string | undefined) => {
         if (!shipmentId) return
 
-        if (window.confirm(`Bạn có chắc chắn muốn xóa lô hàng ${shipmentId}?`)) {
+        if (window.confirm(`Bạn có chắc chắn muốn xóa Shipment ${shipmentId}?`)) {
             removeShipment(shipmentId)
-            toast.success(`Đã xóa lô hàng ${shipmentId}`)
+            toast.success(`Đã xóa Shipment ${shipmentId}`)
         }
     }
 
@@ -43,7 +44,7 @@ export const ShipmentsAdminCard = () => {
             case ShipmentStatus.IN_PROGRESS:
                 return "Đang quét"
             case ShipmentStatus.COMPLETED:
-                return "Đã tạo lô hàng"
+                return "Đã tạo Shipment"
             default:
                 return "Không xác định"
         }
@@ -60,10 +61,10 @@ export const ShipmentsAdminCard = () => {
             import("xlsx").then((XLSX) => {
                 const data = shipments.map((shipment, index) => ({
                     STT: index + 1,
-                    "Mã lô hàng": shipment.id,
+                    "Mã Shipment": shipment.id,
                     "Người tạo": shipment.creator || "—",
                     "Trạng thái": getStatusText(shipment.status),
-                    "Số lượng sản phẩm": shipment.items?.length || 0,
+                    "Số lượng sản phẩm": shipment.billings?.reduce((sum, b) => sum + (b.items?.length || 0), 0) || 0,
                     "Ngày tạo": shipment.createdAt
                         ? moment(shipment.createdAt).format("DD/MM/YYYY HH:mm:ss")
                         : "—",
@@ -72,7 +73,7 @@ export const ShipmentsAdminCard = () => {
                 const worksheet = XLSX.utils.json_to_sheet(data)
                 const columnWidths = [
                     { wch: 5 },  // STT
-                    { wch: 25 }, // Mã lô hàng
+                    { wch: 25 }, // Mã Shipment
                     { wch: 20 }, // Người tạo
                     { wch: 20 }, // Trạng thái
                     { wch: 18 }, // Số lượng sản phẩm
@@ -102,6 +103,10 @@ export const ShipmentsAdminCard = () => {
         // Status filter
         const matchesStatus = statusFilter === "all" || shipment.status === statusFilter
 
+        // Billing filter - tìm kiếm trong tất cả billings của shipment
+        const matchesBilling = (!billingFilter) ||
+            (shipment.billings?.some(b => b.id.toLowerCase().includes(billingFilter.toLowerCase())) ?? false)
+
         // Date filter
         let matchesDate = true
         if (dateFilter !== "all" && shipment.createdAt) {
@@ -121,10 +126,10 @@ export const ShipmentsAdminCard = () => {
             }
         }
 
-        return matchesSearch && matchesStatus && matchesDate
+        return matchesSearch && matchesStatus && matchesBilling && matchesDate
     })
 
-    const totalItems = shipments.reduce((sum, s) => sum + (s.items?.length || 0), 0)
+    const totalItems = shipments.reduce((sum, s) => sum + (s.billings?.reduce((sum, b) => sum + (b.items?.length || 0), 0) || 0), 0)
     const completedShipments = shipments.filter(s => s.status === ShipmentStatus.COMPLETED).length
     const inProgressShipments = shipments.filter(s => s.status === ShipmentStatus.IN_PROGRESS).length
 
@@ -134,12 +139,12 @@ export const ShipmentsAdminCard = () => {
             <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
                 <Card className="rounded-lg shadow-sm">
                     <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Tổng lô hàng</CardTitle>
+                        <CardTitle className="text-sm font-medium">Tổng Shipment</CardTitle>
                         <Package className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{shipments.length}</div>
-                        <p className="text-xs text-muted-foreground">Tất cả lô hàng</p>
+                        <p className="text-xs text-muted-foreground">Tất cả Shipment</p>
                     </CardContent>
                 </Card>
 
@@ -150,18 +155,18 @@ export const ShipmentsAdminCard = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-yellow-600">{inProgressShipments}</div>
-                        <p className="text-xs text-muted-foreground">Lô hàng đang quét</p>
+                        <p className="text-xs text-muted-foreground">Shipment đang quét</p>
                     </CardContent>
                 </Card>
 
                 <Card className="rounded-lg shadow-sm">
                     <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Đã tạo lô hàng</CardTitle>
+                        <CardTitle className="text-sm font-medium">Đã tạo Shipment</CardTitle>
                         <PackageCheck className="w-4 h-4 text-green-600" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">{completedShipments}</div>
-                        <p className="text-xs text-muted-foreground">Lô hàng đã tạo</p>
+                        <p className="text-xs text-muted-foreground">Shipment đã tạo</p>
                     </CardContent>
                 </Card>
 
@@ -184,15 +189,14 @@ export const ShipmentsAdminCard = () => {
                         <div>
                             <CardTitle className="flex gap-2 items-center">
                                 <Package className="w-5 h-5" />
-                                Danh sách lô hàng
+                                Danh sách Shipment
                             </CardTitle>
-                            <CardDescription>Quản lý và theo dõi các lô hàng trong hệ thống</CardDescription>
+                            <CardDescription>Quản lý và theo dõi các Shipment trong hệ thống</CardDescription>
                         </div>
                         <Button
                             variant="default"
                             size="sm"
                             onClick={handleExport}
-                            className="bg-green-600 hover:bg-green-700"
                             disabled={shipments.length === 0}
                         >
                             <Download className="w-4 h-4" />
@@ -201,13 +205,22 @@ export const ShipmentsAdminCard = () => {
                     </div>
 
                     {/* Filters */}
-                    <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 pt-4 md:grid-cols-2 lg:grid-cols-4">
                         <div className="relative">
                             <Search className="absolute top-3 left-3 w-4 h-4 text-gray-400" />
                             <Input
-                                placeholder="Tìm mã lô hàng..."
+                                placeholder="Tìm mã Shipment..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-9"
+                            />
+                        </div>
+                        <div className="relative">
+                            <Search className="absolute top-3 left-3 w-4 h-4 text-gray-400" />
+                            <Input
+                                placeholder="Tìm số billing..."
+                                value={billingFilter}
+                                onChange={(e) => setBillingFilter(e.target.value)}
                                 className="pl-9"
                             />
                         </div>
@@ -218,7 +231,7 @@ export const ShipmentsAdminCard = () => {
                             <SelectContent>
                                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
                                 <SelectItem value={ShipmentStatus.IN_PROGRESS}>Đang quét</SelectItem>
-                                <SelectItem value={ShipmentStatus.COMPLETED}>Đã tạo lô hàng</SelectItem>
+                                <SelectItem value={ShipmentStatus.COMPLETED}>Đã tạo Shipment</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select value={dateFilter} onValueChange={setDateFilter}>
@@ -235,11 +248,11 @@ export const ShipmentsAdminCard = () => {
                     </div>
 
                     {/* Filter summary */}
-                    {(searchTerm || statusFilter !== "all" || dateFilter !== "all") && (
+                    {(searchTerm || billingFilter || statusFilter !== "all" || dateFilter !== "all") && (
                         <div className="flex gap-2 items-center pt-2 text-sm text-gray-600">
                             <Filter className="w-4 h-4" />
                             <span>
-                                Hiển thị {filteredShipments.length} / {shipments.length} lô hàng
+                                Hiển thị {filteredShipments.length} / {shipments.length} Shipment
                             </span>
                         </div>
                     )}
@@ -249,10 +262,11 @@ export const ShipmentsAdminCard = () => {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Mã lô hàng</TableHead>
+                                    <TableHead>Mã Shipment</TableHead>
                                     <TableHead className="hidden sm:table-cell">Người tạo</TableHead>
                                     <TableHead>Trạng thái</TableHead>
-                                    <TableHead className="hidden md:table-cell">Số sản phẩm</TableHead>
+                                    <TableHead className="hidden md:table-cell">Billings</TableHead>
+                                    <TableHead className="hidden md:table-cell">Sản phẩm</TableHead>
                                     <TableHead className="hidden lg:table-cell">Ngày tạo</TableHead>
                                     <TableHead>Thao tác</TableHead>
                                 </TableRow>
@@ -260,10 +274,10 @@ export const ShipmentsAdminCard = () => {
                             <TableBody>
                                 {filteredShipments.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                                        <TableCell colSpan={7} className="h-32 text-center text-gray-500">
                                             {shipments.length === 0
-                                                ? "Chưa có lô hàng nào"
-                                                : "Không tìm thấy lô hàng phù hợp"}
+                                                ? "Chưa có Shipment nào"
+                                                : "Không tìm thấy Shipment phù hợp"}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
@@ -287,7 +301,12 @@ export const ShipmentsAdminCard = () => {
                                                 <TableCell>{getStatusBadge(shipment.status || ShipmentStatus.IN_PROGRESS)}</TableCell>
                                                 <TableCell className="hidden md:table-cell">
                                                     <Badge variant="outline">
-                                                        {shipment.items?.length || 0} sản phẩm
+                                                        {shipment.billings?.length || 0}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="hidden md:table-cell">
+                                                    <Badge variant="outline">
+                                                        {shipment.billings?.reduce((sum, b) => sum + (b.items?.length || 0), 0) || 0}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="hidden text-sm lg:table-cell">

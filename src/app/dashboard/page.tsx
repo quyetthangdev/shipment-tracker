@@ -74,7 +74,7 @@ export default function EmployeePage() {
                         <TabsList className="grid grid-cols-2 mx-auto w-full max-w-md shadow-sm">
                             <TabsTrigger value="shipments" className="flex gap-2 justify-center items-center">
                                 <Package className="w-4 h-4" />
-                                <span>Tạo lô hàng</span>
+                                <span>Tạo Shipment</span>
                             </TabsTrigger>
                             <TabsTrigger value="shipment-detail" className="flex gap-2 justify-center items-center">
                                 <QrCode className="w-4 h-4" />

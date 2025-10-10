@@ -43,12 +43,12 @@ const mockAuditLogs: IAuditLog[] = [
     {
         id: "log-4",
         action: AuditAction.CREATE_SHIPMENT,
-        actionLabel: "Tạo lô hàng",
+        actionLabel: "Tạo Shipment",
         user: "user",
         target: "LH-20240116-001",
         timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 minutes ago
         ipAddress: "192.168.1.105",
-        details: "Tạo lô hàng mới với 15 items",
+        details: "Tạo Shipment mới với 15 items",
     },
     {
         id: "log-5",
@@ -72,12 +72,12 @@ const mockAuditLogs: IAuditLog[] = [
     {
         id: "log-7",
         action: AuditAction.DELETE_SHIPMENT,
-        actionLabel: "Xóa lô hàng",
+        actionLabel: "Xóa Shipment",
         user: "admin",
         target: "LH-20240115-099",
         timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
         ipAddress: "192.168.1.100",
-        details: "Xóa lô hàng đã hoàn thành",
+        details: "Xóa Shipment đã hoàn thành",
     },
     {
         id: "log-8",
@@ -263,8 +263,8 @@ export const AuditLogsCard = () => {
                             <SelectItem value={AuditAction.CREATE_USER}>Tạo người dùng</SelectItem>
                             <SelectItem value={AuditAction.UPDATE_USER}>Cập nhật người dùng</SelectItem>
                             <SelectItem value={AuditAction.DELETE_USER}>Xóa người dùng</SelectItem>
-                            <SelectItem value={AuditAction.CREATE_SHIPMENT}>Tạo lô hàng</SelectItem>
-                            <SelectItem value={AuditAction.DELETE_SHIPMENT}>Xóa lô hàng</SelectItem>
+                            <SelectItem value={AuditAction.CREATE_SHIPMENT}>Tạo Shipment</SelectItem>
+                            <SelectItem value={AuditAction.DELETE_SHIPMENT}>Xóa Shipment</SelectItem>
                         </SelectContent>
                     </Select>
                     <Select value={userFilter} onValueChange={setUserFilter}>

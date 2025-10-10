@@ -4,7 +4,7 @@ import { Search, QrCode, Package, User, Calendar, MapPin, CheckCircle2, XCircle 
 import { useShipmentStore } from "@/stores"
 import { IShipmentItem } from "@/types"
 import moment from "moment"
-import { QRTracerScannerButton } from "./button"
+import { QRTracerScannerButton, QRTracerGM65ScannerButton } from "./button"
 
 interface ItemTraceResult {
     item: IShipmentItem
@@ -133,13 +133,14 @@ export function QRTracerCard() {
                                 className="pl-9"
                             />
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             <Button
                                 onClick={() => handleSearch()}
                             >
                                 <Search className="mr-2 w-4 h-4" />
                                 Tìm kiếm
                             </Button>
+                            <QRTracerGM65ScannerButton onScanComplete={handleScanComplete} />
                             <QRTracerScannerButton onScanComplete={handleScanComplete} />
                         </div>
                     </div>

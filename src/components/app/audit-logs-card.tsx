@@ -160,8 +160,9 @@ export const AuditLogsCard = () => {
             new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         )
 
-    // Get unique users for filter
+    // Get unique users for filter (bỏ Unknown)
     const uniqueUsers = Array.from(new Set(allLogs.map(log => log.user)))
+        .filter(user => user !== "Unknown")
 
     // Filter logs
     const filteredLogs = allLogs.filter((log) => {

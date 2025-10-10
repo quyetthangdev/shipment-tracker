@@ -25,10 +25,14 @@ export const logAudit = (
 };
 
 export const getCurrentUser = (): string => {
-  // Dynamic import để tránh circular dependency
+  // Lấy từ localStorage thay vì dynamic import
   try {
-    const authModule = require("@/stores/auth.store");
-    return authModule.useAuthStore.getState().user?.username || "Unknown";
+    const authStorage = localStorage.getItem("auth-storage");
+    if (authStorage) {
+      const parsed = JSON.parse(authStorage);
+      return parsed.state?.user?.username || "Unknown";
+    }
+    return "Unknown";
   } catch {
     return "Unknown";
   }
